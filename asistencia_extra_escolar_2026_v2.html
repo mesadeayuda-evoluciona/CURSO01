@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Asistencia Extraescolar</title>
+    
+    <!-- Google Fonts: Open Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración de colores personalizados en Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        corp: {
+                            blue: '#002060',
+                            yellow: '#FFD700',
+                            black: '#000000',
+                            gray: '#4B5563',
+                            light: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Open Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Librerías Externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
+            background-attachment: fixed;
+            font-family: 'Open Sans', sans-serif;
+            color: #002060;
+        }
+        .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #002060; }
+        
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .swal2-popup { font-family: 'Open Sans', sans-serif !important; }
+        .swal2-html-container { margin: 1em 0 0.3em !important; overflow: hidden !important; text-align: left !important; color: #002060 !important; }
+        .wave-transition { transition: opacity 0.8s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen relative pb-40">
+
+    <!-- Ondas Decorativas -->
+    <div id="waveTitle" class="wave-transition fixed bottom-0 left-0 w-full z-[-1] pointer-events-none">
+        <svg viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-[180px] md:h-[250px]">
+            <path fill="#000000" fill-opacity="1" d="M0,128L48,144C96,160,192,192,288,181.3C384,171,480,117,576,101.3C672,85,768,107,864,128C960,149,1056,171,1152,160C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            <path fill="#4B5563" fill-opacity="1" d="M0,192L60,176C120,160,240,128,360,133.3C480,139,600,181,720,181.3C840,181,960,139,1080,112C1200,85,1320,75,1380,69.3L1440,64L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+            <path fill="#FFD700" fill-opacity="1" d="M0,160L80,176C160,192,320,224,480,213.3C640,203,800,149,960,133.3C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        </svg>
+    </div>
+
+    <div id="waveContent" class="wave-transition fixed bottom-0 left-0 w-full z-[-1] pointer-events-none opacity-0 hidden">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-[80px] md:h-[120px]">
+            <path fill="#000000" fill-opacity="1" d="M0,32L120,42.7C240,53,480,75,720,69.3C960,64,1200,32,1320,16L1440,0L1440,120L1320,120C1200,120,960,120,720,120C480,120,240,120,120,120L0,120Z"></path>
+            <path fill="#FFD700" fill-opacity="1" d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
+        </svg>
+    </div>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8 relative z-10">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row items-center justify-between pb-6 mb-8 gap-6 border-b-2 border-corp-black">
+            <div class="flex-shrink-0">
+                <img src="https://lsfb.cl/wp-content/uploads/2024/10/cropped-ico3-1.png" alt="Logo Institucional" class="h-20 md:h-28 w-auto object-contain drop-shadow-sm">
+            </div>
+            <div class="flex-1 text-center md:text-right">
+                <h1 class="text-3xl md:text-4xl font-black text-corp-blue tracking-tight uppercase">
+                    Portal de Asistencia
+                </h1>
+                <p class="text-corp-gray font-semibold mt-1 text-md md:text-lg tracking-widest uppercase">
+                    Gestión Extraescolar 2026
+                </p>
+            </div>
+        </header>
+
+        <!-- PORTAL PRINCIPAL (2 Botones) -->
+        <section id="homeSection" class="fade-in flex flex-col items-center justify-center py-6 md:py-12">
+            <h2 class="text-2xl font-bold text-corp-blue mb-10 text-center">Para comenzar, siga estos dos pasos</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+                <!-- Paso 1 -->
+                <button id="btnSyncHome" class="bg-white border-t-4 border-t-corp-blue rounded-xl p-10 text-center shadow-md hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col items-center gap-5 relative overflow-hidden group w-full">
+                    <div id="syncIconContainer" class="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center border border-blue-100 group-hover:bg-blue-100 transition duration-300">
+                        <i id="syncIcon" data-lucide="refresh-cw" class="text-corp-blue w-12 h-12"></i>
+                    </div>
+                    <h3 id="syncTitle" class="text-2xl font-black text-corp-blue uppercase tracking-wide leading-tight">Paso 1:<br>Sincronizar Datos</h3>
+                    <p id="syncDesc" class="text-base text-corp-gray font-semibold">Conectar con la base de datos central de inscripciones</p>
+                </button>
+
+                <!-- Paso 2 -->
+                <button id="btnTeacherHome" class="bg-white border-t-4 border-t-[#FFD700] rounded-xl p-10 text-center shadow-md hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col items-center gap-5 relative group w-full opacity-70 cursor-not-allowed">
+                    <div class="bg-yellow-50 w-24 h-24 rounded-full flex items-center justify-center border border-yellow-200 group-hover:bg-[#FFD700] transition duration-300">
+                        <i data-lucide="clipboard-list" class="text-[#b39700] group-hover:text-corp-black w-12 h-12 transition"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-corp-blue uppercase tracking-wide leading-tight">Paso 2:<br>Pasar Asistencia</h3>
+                    <p class="text-base text-corp-gray font-semibold">Acceder a los listados de cada taller</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: PORTAL DE PROFESORES -->
+        <section id="teachersSection" class="hidden space-y-8 fade-in max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between border-b-2 border-gray-300 pb-4 mb-8 gap-4">
+                <h2 class="text-3xl font-black text-corp-blue flex items-center gap-3 uppercase tracking-wide">
+                    <i data-lucide="clipboard-list" class="w-8 h-8 text-[#b39700]"></i>
+                    Selecciona tu Taller
+                </h2>
+                <button class="btnVolverHome bg-white hover:bg-gray-100 text-corp-blue px-6 py-2.5 rounded shadow-sm font-bold uppercase tracking-wider transition flex items-center gap-2 border border-gray-300">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Volver al Inicio
+                </button>
+            </div>
+            <div id="teachersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        window.isDataLoaded = false;
+        window.globalActivitiesCount = {};
+        window.globalStudentsArray = [];
+        
+        // URL DE GOOGLE APPS SCRIPT
+        const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzPmNZOPXorDphclStBodS72mIpy4v4i9QFHF_qtl8iCoo7DKR3nsWDpU0aVUWK7PnzHw/exec";
+
+        const homeSection = document.getElementById('homeSection');
+        const teachersSection = document.getElementById('teachersSection');
+        const waveTitle = document.getElementById('waveTitle');
+        const waveContent = document.getElementById('waveContent');
+        const btnTeacherHome = document.getElementById('btnTeacherHome');
+
+        // NAVEGACIÓN
+        document.getElementById('btnSyncHome').addEventListener('click', fetchGoogleSheetsData);
+
+        btnTeacherHome.addEventListener('click', () => {
+            if (!window.isDataLoaded) {
+                Swal.fire({ title: 'Paso 1 Requerido', text: 'Por favor, haz clic en "Sincronizar Datos" primero.', icon: 'warning', confirmButtonColor: '#002060' });
+                return;
+            }
+            homeSection.classList.add('hidden');
+            teachersSection.classList.remove('hidden');
+            window.renderTeachersPortal();
+            cambiarOndaAContenido();
+        });
+
+        document.querySelectorAll('.btnVolverHome').forEach(btn => {
+            btn.addEventListener('click', () => {
+                teachersSection.classList.add('hidden');
+                homeSection.classList.remove('hidden');
+                cambiarOndaAPortada();
+            });
+        });
+
+        function cambiarOndaAContenido() {
+            waveTitle.classList.add('opacity-0');
+            setTimeout(() => { waveTitle.classList.add('hidden'); waveContent.classList.remove('hidden'); setTimeout(() => waveContent.classList.remove('opacity-0'), 50); }, 600);
+        }
+
+        function cambiarOndaAPortada() {
+            waveContent.classList.add('opacity-0');
+            setTimeout(() => { waveContent.classList.add('hidden'); waveTitle.classList.remove('hidden'); setTimeout(() => waveTitle.classList.remove('opacity-0'), 50); }, 600);
+        }
+
+        // CONEXIÓN A GOOGLE SHEETS
+        async function fetchGoogleSheetsData() {
+            try {
+                Swal.fire({ title: '<span class="text-corp-blue font-bold font-sans uppercase tracking-wide">Sincronizando...</span>', text: 'Descargando datos en vivo desde la base de datos', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                const sheetId = '11VX0NPqI9x1ZZcu8YgihXkTlF_a1cehC6EvNxNjD2Jk';
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=respuestas`;
+                let response;
+                let csvText = '';
+                
+                try {
+                    // Intento 1: Conexión directa
+                    response = await fetch(url);
+                    if (!response.ok) throw new Error('Conexion directa rechazada');
+                    csvText = await response.text();
+                    // Si Google nos redirige a una página web (iniciar sesión), el archivo no es público.
+                    if (csvText.trim().toLowerCase().startsWith('<!doctype html>')) throw new Error('Requiere permisos');
+                } catch (e) {
+                    if (e.message === 'Requiere permisos') throw e; // Cortar inmediato si es problema de permisos
+                    
+                    try {
+                        // Intento 2: Proxy Primario (Más estable para navegadores restrictivos)
+                        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                        response = await fetch(proxyUrl);
+                        if (!response.ok) throw new Error('Proxy 1 falló');
+                        csvText = await response.text();
+                        if (csvText.trim().toLowerCase().startsWith('<!doctype html>')) throw new Error('Requiere permisos');
+                    } catch (e2) {
+                        if (e2.message === 'Requiere permisos') throw e2;
+
+                        // Intento 3: Proxy Secundario (Respaldo final)
+                        const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                        response = await fetch(proxyUrl2);
+                        if (!response.ok) throw new Error('Proxy 2 falló');
+                        csvText = await response.text();
+                        if (csvText.trim().toLowerCase().startsWith('<!doctype html>')) throw new Error('Requiere permisos');
+                    }
+                }
+                
+                const workbook = XLSX.read(csvText, { type: 'string' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+                if (json.length === 0) { Swal.fire('Sin Datos', 'La hoja de "respuestas" parece estar vacía o no existe. Verifica que la pestaña de inscripciones en tu Excel se llame exactamente "respuestas" en minúsculas.', 'warning'); return; }
+                
+                processData(json);
+                window.isDataLoaded = true;
+
+                const iconContainer = document.getElementById('syncIconContainer');
+                iconContainer.innerHTML = '<i data-lucide="check-circle" class="text-green-600 w-12 h-12"></i>';
+                iconContainer.className = "bg-green-100 w-24 h-24 rounded-full flex items-center justify-center border-2 border-green-400 group-hover:scale-105 transition duration-300 shadow-sm";
+                document.getElementById('syncTitle').innerHTML = "Paso 1:<br>Sincronizado";
+                document.getElementById('syncTitle').classList.replace('text-corp-blue', 'text-green-700');
+                document.getElementById('syncDesc').innerText = "Datos cargados exitosamente. Continúe con el Paso 2.";
+                document.getElementById('btnSyncHome').classList.replace('border-t-corp-blue', 'border-t-green-500');
+                
+                btnTeacherHome.classList.remove('opacity-70', 'cursor-not-allowed');
+                
+                lucide.createIcons();
+                Swal.fire({ title: '¡Éxito!', text: 'Los datos han sido sincronizados correctamente.', icon: 'success', timer: 2000, showConfirmButton: false });
+
+            } catch (error) {
+                console.error(error);
+                if (error.message === 'Requiere permisos') {
+                    Swal.fire({ title: 'Permisos Denegados', text: 'El Google Sheets no es público. Ve a tu Excel, haz clic en el botón "Compartir" y selecciona "Cualquier persona con el enlace" como "Lector".', icon: 'error', confirmButtonColor: '#002060' });
+                } else {
+                    Swal.fire({ title: 'Error de Conexión', text: 'No se pudo conectar a Google Sheets. Tu navegador podría estar bloqueando la conexión. Intenta desactivar tu AdBlocker o usar otro navegador.', icon: 'error', confirmButtonColor: '#002060' });
+                }
+            }
+        }
+
+        // Lógica Avanzada para Identificar Cursos y Ordenarlos
+        function getCursoInfo(cursoStr) {
+            const c = cursoStr.toUpperCase();
+            let grado = parseInt(c.match(/\d+/) ? c.match(/\d+/)[0] : '0');
+            let nivel = 'Otros';
+            let peso = 99; // Por defecto al final
+
+            if (c.includes('BÁSICO') || c.includes('BASICO') || grado === 7 || grado === 8) {
+                nivel = 'Enseñanza Básica';
+                peso = grado; // 7, 8
+            } else if (c.includes('MEDIO') || (grado >= 1 && grado <= 4)) {
+                nivel = 'Enseñanza Media';
+                peso = grado + 8; // 1 Medio = 9, 2 Medio = 10...
+            }
+            return { nivel, peso };
+        }
+
+        function processData(data) {
+            const headers = Object.keys(data[0] || {});
+            const findCol = (keywords) => headers.find(h => keywords.some(kw => h.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes(kw)));
+            
+            const colPaterno = findCol(['paterno']);
+            const colMaterno = findCol(['materno']);
+            const colNombres = findCol(['nombre', 'nombres']);
+            const colCurso = findCol(['curso']);
+            const colActividad = findCol(['actividad', 'taller', 'selecciona', 'inscribira']);
+            const colAutorizacion = findCol(['autorizacion', 'autorización']);
+
+            const studentsMap = new Map(); 
+            const activitiesCount = {};
+
+            const normalizeText = (str) => (str || '').toString().trim().toUpperCase();
+            const normalizeCurso = (str) => {
+                if (!str) return 'SIN CURSO';
+                let c = str.toString().toUpperCase().trim().replace(/[ºª]/g, '°').replace(/(\d)\s*°?\s*([A-Z])/g, '$1°$2');
+                return c.replace(/\s+/g, ' ').trim();
+            };
+
+            data.forEach(row => {
+                const nombres = normalizeText(row[colNombres]);
+                const paterno = colPaterno ? normalizeText(row[colPaterno]) : '';
+                const materno = colMaterno ? normalizeText(row[colMaterno]) : '';
+                if (!nombres && !paterno) return;
+
+                const curso = colCurso ? normalizeCurso(row[colCurso]) : 'SIN CURSO';
+                const autorizacionRaw = colAutorizacion ? (row[colAutorizacion] || '').toString().trim().toUpperCase() : '';
+                const autorizacion = autorizacionRaw === '' ? 'PENDIENTE' : autorizacionRaw;
+                const uniqueKey = `${nombres} ${paterno} ${materno}`.trim();
+                const rawActivities = (row[colActividad] || '').toString();
+
+                // LÓGICA DE LIMPIEZA ROBUSTA:
+                // 1. Borrar paréntesis cerrados completos para que las comas internas no rompan la separación.
+                let cleanedActivities = rawActivities.replace(/\([^)]*\)/g, '');
+                
+                // 2. Dividir por comas, y si quedó algún paréntesis abierto sin cerrar (error de tipeo), se borra.
+                // 3. SE FILTRA EXPLICITAMENTE "CUENTA CUENTOS" PARA QUE NO SE SINCROINCE NI SE MUESTRE.
+                const parsedActivities = cleanedActivities.split(',')
+                    .map(act => act.replace(/\(.*/, '').trim().toUpperCase())
+                    .filter(act => act !== '' && !act.includes('CUENTA CUENTOS') && !act.includes('CUENTACUENTOS'));
+
+                if (!studentsMap.has(uniqueKey)) {
+                    studentsMap.set(uniqueKey, { 
+                        fullName: uniqueKey, 
+                        curso: curso, 
+                        infoNivel: getCursoInfo(curso),
+                        activities: [], 
+                        autorizacion: autorizacion 
+                    });
+                }
+
+                const studentData = studentsMap.get(uniqueKey);
+                if (autorizacion !== 'PENDIENTE' && studentData.autorizacion === 'PENDIENTE') {
+                    studentData.autorizacion = autorizacion;
+                }
+                studentData.activities.push(...parsedActivities);
+            });
+
+            window.globalStudentsArray = Array.from(studentsMap.values());
+            studentsMap.forEach((student) => {
+                const uniqueActivitiesForStudent = [...new Set(student.activities)];
+                uniqueActivitiesForStudent.forEach(act => { activitiesCount[act] = (activitiesCount[act] || 0) + 1; });
+            });
+            window.globalActivitiesCount = activitiesCount;
+        }
+
+        window.renderTeachersPortal = function() {
+            const grid = document.getElementById('teachersGrid');
+            const sortedActivities = Object.entries(window.globalActivitiesCount).sort((a, b) => a[0].localeCompare(b[0]));
+            
+            grid.innerHTML = sortedActivities.map(item => {
+                const tallerSafe = item[0].replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                return `
+                    <div class="bg-white border-t-4 border-corp-yellow rounded-xl p-6 shadow-md hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col justify-between h-full group">
+                        <div class="mb-5">
+                            <h3 class="text-lg font-black text-corp-blue mb-2 leading-tight uppercase tracking-wide">${item[0]}</h3>
+                            <span class="inline-flex items-center gap-1.5 bg-gray-100 text-corp-gray text-xs font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider">
+                                <i data-lucide="users" class="w-3 h-3"></i> ${item[1]} Alumnos
+                            </span>
+                        </div>
+                        <div class="flex gap-2 w-full mt-2">
+                            <button onclick="window.verHistorialTaller('${tallerSafe}')" class="bg-gray-100 hover:bg-gray-200 text-corp-blue py-3 px-2 rounded shadow-sm font-bold uppercase tracking-widest transition flex items-center justify-center gap-1.5 w-1/2 text-[11px] border border-gray-300">
+                                <i data-lucide="history" class="w-4 h-4"></i> Historial
+                            </button>
+                            <button onclick="window.abrirAsistenciaTaller('${tallerSafe}')" class="bg-corp-black hover:bg-gray-800 text-corp-yellow py-3 px-2 rounded shadow-md font-bold uppercase tracking-widest transition flex items-center justify-center gap-1.5 w-1/2 text-[11px]">
+                                <i data-lucide="clipboard-check" class="w-4 h-4"></i> Asistencia
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        // --- MODAL: PASAR ASISTENCIA (AHORA ASÍNCRONO PARA LEER HISTORIAL) ---
+        window.abrirAsistenciaTaller = async function(taller) {
+            
+            // Mostrar pantalla de carga mientras obtenemos el número de sesión
+            Swal.fire({ title: 'Preparando lista...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            let numSesionTexto = "Cargando...";
+            try {
+                // Hacer una petición GET secreta a Apps Script para contar las columnas de fechas previas
+                const res = await fetch(URL_APPS_SCRIPT + "?action=count&taller=" + encodeURIComponent(taller));
+                const count = await res.text();
+                if(!isNaN(parseInt(count))) {
+                    numSesionTexto = `Registro N° ${parseInt(count) + 1}`;
+                } else { numSesionTexto = "Nuevo Registro"; }
+            } catch(e) { 
+                console.log("No se pudo obtener el historial", e);
+                numSesionTexto = "Nuevo Registro"; 
+            }
+
+            // Filtrar y ordenar alumnos por Nivel (Básica primero, luego Media, luego Alfabético)
+            let students = window.globalStudentsArray.filter(s => s.activities.includes(taller));
+            students.sort((a, b) => {
+                if (a.infoNivel.peso !== b.infoNivel.peso) return a.infoNivel.peso - b.infoNivel.peso;
+                if (a.curso !== b.curso) return a.curso.localeCompare(b.curso);
+                return a.fullName.localeCompare(b.fullName);
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Construir las filas con separadores visuales
+            let tbodyHtml = '';
+            let currentNivel = '';
+            let globalIndexCounter = 0; // Para enumerarlos del 1 al N saltando las filas de separadores
+
+            students.forEach((s, index) => {
+                // Agregar fila separadora si cambia el nivel
+                if (s.infoNivel.nivel !== currentNivel) {
+                    currentNivel = s.infoNivel.nivel;
+                    let colorFondo = currentNivel === 'Enseñanza Básica' ? 'bg-[#002060] text-white' : 'bg-corp-yellow text-corp-black';
+                    tbodyHtml += `
+                        <tr>
+                            <td colspan="5" class="${colorFondo} text-center font-bold py-2 text-xs uppercase tracking-widest shadow-inner border-y border-gray-300">
+                                ${currentNivel}
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                globalIndexCounter++;
+                let authBadge = 'bg-gray-200 text-corp-black';
+                if (s.autorizacion === 'RECEPCIONADO' || s.autorizacion.includes('SI') || s.autorizacion.includes('SÍ')) {
+                    authBadge = 'bg-green-100 text-green-800 border border-green-200';
+                } else if (s.autorizacion === 'PENDIENTE' || s.autorizacion.includes('NO')) {
+                    authBadge = 'bg-red-100 text-red-800 border border-red-200';
+                }
+
+                tbodyHtml += `
+                <tr class="hover:bg-blue-50 transition duration-150">
+                    <td class="px-4 py-2 font-bold text-corp-gray text-xs">${globalIndexCounter}</td>
+                    <td class="px-4 py-2 font-semibold text-corp-blue text-xs">${s.fullName}</td>
+                    <td class="px-4 py-2 font-bold text-corp-black text-center text-xs">${s.curso}</td>
+                    <td class="px-4 py-2 text-center">
+                        <span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-widest shadow-sm ${authBadge}">${s.autorizacion}</span>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        <!-- ESTADO EN BLANCO POR DEFECTO -->
+                        <select id="asistencia_${index}" class="bg-white border border-gray-300 text-corp-blue font-bold text-xs rounded px-2 py-1.5 outline-none focus:border-corp-blue shadow-sm w-full cursor-pointer hover:border-gray-400">
+                            <option value="" selected>-- Estado --</option>
+                            <option value="Presente" class="text-green-700 font-bold">✓ Presente</option>
+                            <option value="Ausente" class="text-red-600 font-bold">✗ Ausente</option>
+                            <option value="Atrasado" class="text-orange-600 font-bold">⌚ Atrasado</option>
+                            <option value="Justificado" class="text-blue-600 font-bold">ℹ️ Justificado</option>
+                            <option value="Retirado" class="text-gray-600 font-bold">🔘 Retirado</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+
+            let html = `
+                <div class="text-left mt-2 font-sans">
+                    <div class="mb-5 bg-gray-50 p-4 border border-gray-300 rounded flex flex-col md:flex-row items-center gap-4 justify-between shadow-inner">
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <label class="text-sm font-bold text-corp-blue uppercase tracking-wide">Fecha de clase:</label>
+                            <input type="date" id="fechaAsistencia" value="${today}" class="bg-white border border-gray-400 p-2 text-sm text-corp-blue font-bold rounded shadow-sm outline-none focus:border-corp-blue focus:ring-1 focus:ring-corp-blue flex-1">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-yellow-100 text-yellow-800 border border-yellow-300 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm">
+                                📌 ${numSesionTexto}
+                            </span>
+                            <div class="text-sm text-corp-gray font-semibold bg-white px-3 py-2 border border-gray-200 rounded shadow-sm text-center">
+                                Alumnos: <span class="text-corp-blue font-black text-lg">${students.length}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="max-h-[60vh] overflow-y-auto border border-gray-300 table-container bg-white mb-2 shadow-sm rounded">
+                        <table class="min-w-full text-sm text-left">
+                            <thead class="bg-corp-light sticky top-0 shadow-sm z-10 border-b border-gray-300">
+                                <tr>
+                                    <th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs tracking-wider">N°</th>
+                                    <th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs tracking-wider">Alumno</th>
+                                    <th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs tracking-wider text-center">Curso</th>
+                                    <th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs tracking-wider text-center">Autorización</th>
+                                    <th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs tracking-wider text-center">Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${tbodyHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            Swal.fire({
+                title: `<div class="text-2xl font-black text-corp-blue flex items-center justify-start gap-3 pb-3 border-b-2 border-corp-yellow font-sans uppercase">
+                            <i data-lucide="clipboard-check" class="w-6 h-6 text-corp-black"></i>
+                            Asistencia: ${taller}
+                        </div>`,
+                html: html,
+                width: '850px',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar en Excel',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#002060',
+                cancelButtonColor: '#4B5563',
+                background: '#ffffff',
+                didOpen: () => lucide.createIcons(),
+                preConfirm: () => {
+                    const fechaRaw = document.getElementById('fechaAsistencia').value;
+                    if (!fechaRaw) { Swal.showValidationMessage('Debes seleccionar una fecha para la clase'); return false; }
+                    
+                    const listaAsistencia = students.map((s, index) => {
+                        const estadoSel = document.getElementById(`asistencia_${index}`).value || "";
+                        return { alumno: s.fullName, curso: s.curso, autorizacion: s.autorizacion, estado: estadoSel };
+                    });
+
+                    const [year, month, day] = fechaRaw.split('-');
+                    return { fecha: `${day}-${month}-${year}`, taller, asistencia: listaAsistencia };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) { enviarAsistenciaAPI(result.value); }
+            });
+        };
+
+        // --- MODAL: VER HISTORIAL ---
+        window.verHistorialTaller = async function(taller) {
+            Swal.fire({ title: 'Cargando historial...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            try {
+                const res = await fetch(URL_APPS_SCRIPT + "?action=history&taller=" + encodeURIComponent(taller));
+                const data = await res.json();
+                
+                if (!data.headers || data.headers.length <= 4) {
+                    Swal.fire({
+                        title: 'Sin registros', 
+                        text: 'Aún no hay asistencias guardadas para este taller.', 
+                        icon: 'info',
+                        confirmButtonColor: '#002060'
+                    });
+                    return;
+                }
+
+                // Construir la cabecera de la tabla
+                let thead = '<tr>';
+                thead += `<th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs sticky left-0 bg-corp-light z-20 border-b border-r border-gray-300 shadow-[1px_0_0_0_#ccc]">Alumno</th>`;
+                thead += `<th class="px-4 py-3 text-corp-blue font-bold uppercase text-xs bg-corp-light border-b border-r-2 border-gray-400 text-center whitespace-nowrap">Curso</th>`;
+                for(let i=4; i<data.headers.length; i++) {
+                    thead += `<th class="px-4 py-3 text-corp-blue font-bold uppercase text-[10px] text-center whitespace-nowrap border-b border-gray-300 bg-corp-light">${data.headers[i]}</th>`;
+                }
+                thead += '</tr>';
+
+                // Construir el cuerpo de la tabla
+                let tbody = '';
+                data.rows.forEach(row => {
+                    tbody += `<tr class="hover:bg-blue-50">`;
+                    // row[1] es el Nombre, row[2] es el Curso separados
+                    tbody += `<td class="px-4 py-2 font-semibold text-corp-blue text-xs sticky left-0 bg-white border-b border-r border-gray-200 shadow-[1px_0_0_0_#e5e7eb] whitespace-nowrap">
+                                ${row[1]}
+                              </td>`;
+                    tbody += `<td class="px-4 py-2 font-bold text-corp-black text-xs border-b border-r-2 border-gray-300 text-center whitespace-nowrap bg-gray-50">
+                                ${row[2]}
+                              </td>`;
+                    
+                    // Fechas (a partir de la columna 4)
+                    for(let i=4; i<row.length; i++) {
+                        let estado = row[i] || '-';
+                        let badge = '';
+                        if(estado === 'Presente') badge = '<span class="bg-green-100 text-green-700 font-bold px-2.5 py-1 rounded text-[10px]">P</span>';
+                        else if(estado === 'Ausente') badge = '<span class="bg-red-100 text-red-700 font-bold px-2.5 py-1 rounded text-[10px]">A</span>';
+                        else if(estado === 'Atrasado') badge = '<span class="bg-orange-100 text-orange-700 font-bold px-2.5 py-1 rounded text-[10px]">Atr</span>';
+                        else if(estado === 'Justificado') badge = '<span class="bg-blue-100 text-blue-700 font-bold px-2.5 py-1 rounded text-[10px]">J</span>';
+                        else if(estado === 'Retirado') badge = '<span class="bg-gray-100 text-gray-700 font-bold px-2.5 py-1 rounded text-[10px]">R</span>';
+                        else badge = `<span class="text-gray-400 text-[10px] font-bold">-</span>`;
+                        
+                        tbody += `<td class="px-4 py-2 text-center border-b border-gray-100">${badge}</td>`;
+                    }
+                    tbody += `</tr>`;
+                });
+
+                let html = `
+                    <div class="mt-4 overflow-x-auto max-h-[60vh] border border-gray-300 rounded shadow-sm relative table-container">
+                        <table class="min-w-full text-left bg-white border-collapse">
+                            <thead class="bg-corp-light sticky top-0 shadow-sm z-30">
+                                ${thead}
+                            </thead>
+                            <tbody>
+                                ${tbody}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: `<div class="text-2xl font-black text-corp-blue flex items-center justify-start gap-3 border-b-2 border-corp-yellow pb-3 font-sans uppercase">
+                                <i data-lucide="history" class="w-6 h-6 text-corp-black"></i>
+                                Historial: ${taller}
+                            </div>`,
+                    html: html,
+                    width: '900px', // Extra ancho para acomodar múltiples fechas
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    background: '#ffffff',
+                    didOpen: () => lucide.createIcons()
+                });
+
+            } catch(e) {
+                console.error(e);
+                Swal.fire('Error', 'No se pudo cargar el historial. Verifique su conexión.', 'error');
+            }
+        };
+
+        // --- ENVIAR DATOS A GOOGLE SHEETS ---
+        window.enviarAsistenciaAPI = async function(dataPayload) {
+            Swal.fire({ title: '<span class="text-corp-blue font-bold font-sans uppercase">Guardando...</span>', text: 'Escribiendo la asistencia en tu Google Sheets. Por favor espera.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const response = await fetch(URL_APPS_SCRIPT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dataPayload) });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    Swal.fire({ title: '¡Asistencia Registrada!', text: `Se guardó correctamente la lista.`, icon: 'success', confirmButtonColor: '#002060' });
+                } else { throw new Error(result.message || 'Error desconocido'); }
+            } catch (error) {
+                console.error("Error guardando asistencia:", error);
+                Swal.fire({ title: 'Error', text: 'Hubo un problema al intentar guardar en el Excel.', icon: 'error', confirmButtonColor: '#002060' });
+            }
+        };
+    </script>
+</body>
+</html>
