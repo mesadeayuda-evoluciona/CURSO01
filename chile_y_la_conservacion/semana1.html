@@ -1,1 +1,3540 @@
-No data
+<html lang="es" class="h-full bg-slate-50"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Reporte Moodle - SBAP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#16a34a',
+                            800: '#166534',
+                            900: '#14532d',
+                            sbap: '#134e4a', 
+                            gold: '#b45309'  
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .scroll-custom::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scroll-custom::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .scroll-custom::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .scroll-custom::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.inset-y-0{top:0px;bottom:0px}.left-0{left:0px}.top-0{top:0px}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.ml-2{margin-left:0.5rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-14{height:3.5rem}.h-20{height:5rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-full{height:100%}.max-h-\[90vh\]{max-height:90vh}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-56{width:14rem}.w-6{width:1.5rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-7xl{max-width:80rem}.flex-1{flex:1 1 0%}.border-collapse{border-collapse:collapse}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.space-x-1 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.25rem * var(--tw-space-x-reverse));margin-left:calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-slate-100 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(241 245 249 / var(--tw-divide-opacity, 1))}.self-start{align-self:flex-start}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-b-4{border-bottom-width:4px}.border-l{border-left-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-brand-gold{--tw-border-opacity:1;border-color:rgb(180 83 9 / var(--tw-border-opacity, 1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-teal-800{--tw-border-opacity:1;border-color:rgb(17 94 89 / var(--tw-border-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-amber-600{--tw-bg-opacity:1;background-color:rgb(217 119 6 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-brand-sbap{--tw-bg-opacity:1;background-color:rgb(19 78 74 / var(--tw-bg-opacity, 1))}.bg-purple-50{--tw-bg-opacity:1;background-color:rgb(250 245 255 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-teal-50{--tw-bg-opacity:1;background-color:rgb(240 253 250 / var(--tw-bg-opacity, 1))}.bg-teal-950{--tw-bg-opacity:1;background-color:rgb(4 47 46 / var(--tw-bg-opacity, 1))}.bg-teal-950\/40{background-color:rgb(4 47 46 / 0.4)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-emerald-100{--tw-bg-opacity:1;background-color:rgb(209 250 229 / var(--tw-bg-opacity, 1))}.object-contain{object-fit:contain}.p-1{padding:0.25rem}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pl-3{padding-left:0.75rem}.pl-4{padding-left:1rem}.pl-9{padding-left:2.25rem}.pr-4{padding-right:1rem}.pt-4{padding-top:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-brand-sbap{--tw-text-opacity:1;color:rgb(19 78 74 / var(--tw-text-opacity, 1))}.text-emerald-200{--tw-text-opacity:1;color:rgb(167 243 208 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-teal-100{--tw-text-opacity:1;color:rgb(204 251 241 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-emerald-800{--tw-text-opacity:1;color:rgb(6 95 70 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:border-brand-sbap\/50:hover{border-color:rgb(19 78 74 / 0.5)}.hover\:bg-amber-700:hover{--tw-bg-opacity:1;background-color:rgb(180 83 9 / var(--tw-bg-opacity, 1))}.hover\:bg-brand-900:hover{--tw-bg-opacity:1;background-color:rgb(20 83 45 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-50\/20:hover{background-color:rgb(236 253 245 / 0.2)}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-300:hover{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.hover\:bg-teal-900:hover{--tw-bg-opacity:1;background-color:rgb(19 78 74 / var(--tw-bg-opacity, 1))}.hover\:text-brand-sbap:hover{--tw-text-opacity:1;color:rgb(19 78 74 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:border-brand-sbap:focus{--tw-border-opacity:1;border-color:rgb(19 78 74 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-brand-sbap\/20:focus{--tw-ring-color:rgb(19 78 74 / 0.2)}.disabled\:cursor-not-allowed:disabled{cursor:not-allowed}.disabled\:opacity-50:disabled{opacity:0.5}.group:hover .group-hover\:text-brand-sbap{--tw-text-opacity:1;color:rgb(19 78 74 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:p-6{padding:1.5rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 768px){.md\:block{display:block}.md\:max-w-md{max-width:28rem}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}.md\:justify-between{justify-content:space-between}.md\:self-auto{align-self:auto}}@media (min-width: 1024px){.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.lg\:p-8{padding:2rem}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
+<body class="flex flex-col min-h-screen text-slate-800 antialiased">
+
+    <div id="setup-view" class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl w-full mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="bg-brand-sbap p-8 text-white text-center border-b-4 border-brand-gold">
+                <div class="inline-block bg-white p-3 rounded-2xl shadow-md mb-4">
+                    <img src="https://files.catbox.moe/rl7xn6.png" alt="SBAP Logo" class="h-14 object-contain">
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight">Creador de Dashboard de Alumnos</h1>
+                <p class="text-emerald-200 text-sm mt-1">Sube los reportes del curso "Chile y la conservación" (Motor Híbrido Inteligente)</p>
+            </div>
+
+            <div class="p-8 space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 flex items-center space-x-2">
+                        <span class="w-6 h-6 bg-brand-sbap text-white rounded-full flex items-center justify-center text-xs">1</span>
+                        <span>Archivo de Participantes (Excel guardado como CSV)</span>
+                    </label>
+                    <div id="dropzone-participants" class="border-2 border-dashed border-slate-200 hover:border-brand-sbap/50 rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-emerald-50/20 transition-all group">
+                        <input type="file" id="file-participants" accept=".csv" class="hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" aria-hidden="true" class="lucide lucide-users w-10 h-10 mx-auto text-slate-400 group-hover:text-brand-sbap transition mb-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <p class="text-sm font-semibold text-slate-600 group-hover:text-slate-800 transition" id="label-participants"><span class="text-emerald-600 font-bold">✓ Éxito</span> (90 alumnos leídos)</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 flex items-center space-x-2">
+                        <span class="w-6 h-6 bg-brand-sbap text-white rounded-full flex items-center justify-center text-xs">2</span>
+                        <span>Informe de Finalización de Actividades (CSV de Moodle)</span>
+                    </label>
+                    <div id="dropzone-progress" class="border-2 border-dashed border-slate-200 hover:border-brand-sbap/50 rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-emerald-50/20 transition-all group">
+                        <input type="file" id="file-progress" accept=".csv" class="hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="activity" aria-hidden="true" class="lucide lucide-activity w-10 h-10 mx-auto text-slate-400 group-hover:text-brand-sbap transition mb-2"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
+                        <p class="text-sm font-semibold text-slate-600 group-hover:text-slate-800 transition" id="label-progress"><span class="text-emerald-600 font-bold">✓ Éxito</span> (90 registros)</p>
+                    </div>
+                </div>
+
+                <div id="status-box" class="p-4 rounded-xl text-sm font-semibold text-center bg-emerald-100 text-emerald-800">¡Archivos detectados y listos!</div>
+
+                <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                    <button onclick="procesarYPrevisualizar()" class="flex-1 py-3 px-4 bg-brand-sbap hover:bg-brand-900 text-white rounded-xl text-sm font-bold shadow-md transition-all flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="eye" aria-hidden="true" class="lucide lucide-eye w-4 h-4"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <span>Previsualizar Dashboard</span>
+                    </button>
+                    <button id="btn-descargar-final" onclick="exportarHTMLCliente()" class="flex-1 py-3 px-4 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold shadow-md transition-all flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download w-4 h-4"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+                        <span>Descargar para el Cliente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="hidden flex-1 flex flex-col">
+        <header class="bg-brand-sbap text-white border-b-4 border-brand-gold shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white p-2 rounded-lg shadow-inner flex items-center justify-center">
+                            <img src="https://files.catbox.moe/rl7xn6.png" alt="SBAP Logo" class="h-11 object-contain">
+                        </div>
+                        <div class="hidden md:block">
+                            <h2 class="font-bold text-sm leading-tight">Chile y la conservación: 100 años de decisiones para proteger el territorio</h2>
+                            <p class="text-emerald-300 text-xs uppercase tracking-wider font-semibold">Dashboard de Avance</p>
+                        </div>
+                    </div>
+                    <button id="btn-volver-generador" onclick="mostrarGenerador()" class="hidden px-4 py-2 bg-teal-950 hover:bg-teal-900 border border-teal-800 text-teal-100 rounded-xl text-xs font-bold transition shadow-sm">
+                        ← Cargar Nuevos Archivos
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 transition hover:shadow-md">
+                    <div class="p-3 bg-teal-50 rounded-xl text-brand-sbap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" aria-hidden="true" class="lucide lucide-users w-6 h-6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight">Alumnos Registrados</p>
+                        <h3 id="kpi-total" class="text-xl font-extrabold text-slate-800 mt-1">--</h3>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Matriculados vigentes</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 transition hover:shadow-md">
+                    <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clipboard-signature" aria-hidden="true" class="lucide lucide-clipboard-signature w-6 h-6"><rect width="8" height="4" x="8" y="2" rx="1"></rect><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-.5"></path><path d="M16 4h2a2 2 0 0 1 1.73 1"></path><path d="M8 18h1"></path><path d="M21.378 12.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight">Encuesta de Inscripción</p>
+                        <div class="flex items-baseline space-x-2 mt-1">
+                            <h3 id="kpi-inscripcion" class="text-xl font-extrabold text-slate-800">--</h3>
+                            <span id="kpi-inscripcion-porc" class="text-xs font-bold text-blue-600">(--%)</span>
+                        </div>
+                        <p class="text-[11px] text-blue-600 font-medium mt-0.5">Alumnos únicos (sin duplicados)</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 transition hover:shadow-md">
+                    <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smile" aria-hidden="true" class="lucide lucide-smile w-6 h-6"><path d="M15 10V9"></path><path d="M16.472 15a6 6 0 01-8.943 0"></path><path d="M9 10V9"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight">Encuesta Satisfacción</p>
+                        <div class="flex items-baseline space-x-2 mt-1">
+                            <h3 id="kpi-satisfaccion" class="text-xl font-extrabold text-slate-800">--</h3>
+                            <span id="kpi-satisfaccion-porc" class="text-xs font-bold text-purple-600">(--%)</span>
+                        </div>
+                        <p class="text-[11px] text-purple-600 font-medium mt-0.5">Alumnos únicos evaluaron</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 transition hover:shadow-md">
+                    <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="award" aria-hidden="true" class="lucide lucide-award w-6 h-6"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path><circle cx="12" cy="8" r="6"></circle></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight">Certificados Emitidos</p>
+                        <div class="flex items-baseline space-x-2 mt-1">
+                            <h3 id="kpi-certificados" class="text-xl font-extrabold text-slate-800">--</h3>
+                            <span id="kpi-certificados-porc" class="text-xs font-bold text-amber-600">(--%)</span>
+                        </div>
+                        <p class="text-[11px] text-amber-600 font-medium mt-0.5">Alumnos acreditados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex p-1 bg-slate-100 rounded-xl space-x-1 self-start md:self-auto">
+                    <button id="tab-btn-accesos" onclick="switchTab('accesos')" class="flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm bg-white text-brand-sbap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" aria-hidden="true" class="lucide lucide-calendar w-4 h-4"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg>
+                        <span>Control de Accesos</span>
+                    </button>
+                    <button id="tab-btn-progreso" onclick="switchTab('progreso')" class="flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-brand-sbap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="graduation-cap" aria-hidden="true" class="lucide lucide-graduation-cap w-4 h-4"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>
+                        <span>Avance &amp; Certificados</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-3 w-full md:max-w-md">
+                    <div class="relative w-full">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="search" aria-hidden="true" class="lucide lucide-search w-4 h-4"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+                        </span>
+                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Buscar por nombre o correo..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-sbap/20 focus:border-brand-sbap transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <section id="section-accesos" class="space-y-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="setAccessSubfilter('todos')" id="sub-acc-todos" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-sbap text-white">Todos</button>
+                    <button onclick="setAccessSubfilter('recientes')" id="sub-acc-recientes" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Recientes (&lt; 5 días)</button>
+                    <button onclick="setAccessSubfilter('alertas')" id="sub-acc-alertas" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Ausentes / Inactivos</button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="overflow-x-auto scroll-custom">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                    <th class="py-4 px-6">Alumno</th>
+                                    <th class="py-4 px-6">Email</th>
+                                    <th class="py-4 px-6">Último Acceso</th>
+                                    <th class="py-4 px-6">Semáforo de Inactividad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-accesos" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-progreso" class="hidden space-y-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="setProgressSubfilter('todos')" id="sub-prog-todos" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-sbap text-white">Todos</button>
+                    <button onclick="setProgressSubfilter('certificado')" id="sub-prog-certificado" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Certificado Emitido 🎓</button>
+                    <button onclick="setProgressSubfilter('en-curso')" id="sub-prog-en-curso" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">En Curso</button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="overflow-x-auto scroll-custom">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                    <th class="py-4 px-6">Alumno</th>
+                                    <th class="py-4 px-6 w-56">Progreso General</th>
+                                    <th class="py-4 px-6 text-center">%</th>
+                                    <th class="py-4 px-6">Progreso Módulos</th>
+                                    <th class="py-4 px-6 text-center">Certificado</th>
+                                    <th class="py-4 px-6 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-progreso" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-detalle" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-brand-sbap text-white px-6 py-5 flex items-center justify-between border-b border-brand-gold">
+                <div>
+                    <h3 id="modal-nombre" class="text-lg font-bold">---</h3>
+                    <p id="modal-email" class="text-xs text-slate-200">---</p>
+                </div>
+                <button onclick="closeModal()" class="text-teal-100 hover:text-white transition bg-teal-950/40 p-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" aria-hidden="true" class="lucide lucide-x w-5 h-5"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto scroll-custom space-y-6 flex-1">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <span class="text-xs text-slate-500 block font-medium">Último acceso registrado:</span>
+                    <strong id="modal-ultimo-acc" class="text-sm text-slate-800">---</strong>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Detalle Cronológico de Progreso</h4>
+                    <div id="modal-modulos-list" class="relative border-l border-slate-100 pl-4 ml-2 space-y-4"></div>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 flex justify-end border-t border-slate-100">
+                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-300 transition-all">Cerrar Detalle</button>
+            </div>
+        </div>
+    </div>
+
+    <script>/*DATA_EMBEDDED*/ const ALUMNOS_DATA = [
+  {
+    "nombre": "paula aguad neira",
+    "email": "paula.aguad@gmail.com",
+    "ultimo_acceso": "19 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Valentina Ahumada",
+    "email": "ahumadavalentina257@gmail.com",
+    "ultimo_acceso": "20 días",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Ivory Alarcón Mendoza",
+    "email": "ijalarcon@bmciencias.ucsc.cl",
+    "ultimo_acceso": "18 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Constanza Andía",
+    "email": "constanza.andia@pucv.cl",
+    "ultimo_acceso": "20 días 10 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Consuelo Ávalos Troncoso",
+    "email": "terapiaocupacionalmascerca@gmail.com",
+    "ultimo_acceso": "20 días 15 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Carolina Vanessa Bahamondes Jorquera",
+    "email": "carolinabahamondesderecho@gmail.com",
+    "ultimo_acceso": "20 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Neva Raquel Becerra Rumillanca",
+    "email": "neva.becerra@gmail.com",
+    "ultimo_acceso": "17 días 20 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Maureen Brito",
+    "email": "mbritomanriquez@gmail.com",
+    "ultimo_acceso": "15 días 8 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Ared Bruna Velis",
+    "email": "aribruvel@gmail.com",
+    "ultimo_acceso": "19 días 12 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Carolina Burgos",
+    "email": "burgcaro@gmail.com",
+    "ultimo_acceso": "19 días 1 hora",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Lorena Burotto",
+    "email": "lorena.burotto@gmail.com",
+    "ultimo_acceso": "17 días 14 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Jacqueline Calderón Morales",
+    "email": "jaky.calderon.m@gmail.com",
+    "ultimo_acceso": "14 días 15 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Melissa Carreño Paredes",
+    "email": "mecarreno.p@gmail.com",
+    "ultimo_acceso": "14 días 12 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Fernando Cayun de la peña",
+    "email": "fernando@parquelosnires.cl",
+    "ultimo_acceso": "19 días 21 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Joseffa Noemí Cervantes Muñoz",
+    "email": "joseffa.cervantes.m@gmail.com",
+    "ultimo_acceso": "19 días 23 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Luis Cervela Pavez",
+    "email": "lacervela@gmail.com",
+    "ultimo_acceso": "20 días 14 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "francisco chandia",
+    "email": "fchandia2111@gmail.com",
+    "ultimo_acceso": "13 días 17 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 80,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "patriks chavez maldonado",
+    "email": "pchavez@puelopatagonia.cl",
+    "ultimo_acceso": "17 días 10 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Yuri Cid vargas",
+    "email": "yuricidvargas45@gmail.com",
+    "ultimo_acceso": "19 días 17 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Amanda Contreras Morales",
+    "email": "acontrerasmorales@hotmail.com",
+    "ultimo_acceso": "19 días 10 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Henry Fabian Curamil lienqueo",
+    "email": "hendrixcuramil@gmail.com",
+    "ultimo_acceso": "20 días",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Viviana Curio",
+    "email": "vhuilinir@gmail.com",
+    "ultimo_acceso": "20 días 11 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Sofía De Cesare Uribe",
+    "email": "decesareuribe@gmail.com",
+    "ultimo_acceso": "18 días 21 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Salvador Decap",
+    "email": "decap.alegria@gmail.com",
+    "ultimo_acceso": "16 días 12 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Cristóbal Díaz",
+    "email": "cfdiaz3@uc.cl",
+    "ultimo_acceso": "20 días 9 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Fernando Díaz",
+    "email": "ferndiazgonz@gmail.com",
+    "ultimo_acceso": "17 días 21 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Ana Isabel Estévez Cuadrado",
+    "email": "ele46464@gmail.com",
+    "ultimo_acceso": "9 días 14 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Francesca Fedele",
+    "email": "f.fedele@hotmail.com",
+    "ultimo_acceso": "7 días 19 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Juan José Flores Cárcamo",
+    "email": "juanjoflores.gestor.cultural@gmail.com",
+    "ultimo_acceso": "19 días 19 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "René Fuentes",
+    "email": "r.fuentesorm@gmail.com",
+    "ultimo_acceso": "14 días 10 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Daniela García",
+    "email": "daniela.garcia.turra@gmail.com",
+    "ultimo_acceso": "19 días 10 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Diego Gatica Grandón",
+    "email": "diego21gatica@gmail.com",
+    "ultimo_acceso": "14 días 7 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "karinna giancaspero",
+    "email": "holakarinna@gmail.com",
+    "ultimo_acceso": "11 días 22 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Franco Gonzalez",
+    "email": "franco.agm26@gmail.com",
+    "ultimo_acceso": "20 días 19 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Ignacia Grollmus",
+    "email": "ignaciaa.gr@gmail.com",
+    "ultimo_acceso": "14 días 8 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Catalina María José Guerrero Milanca",
+    "email": "catalina25t.t@gmail.com",
+    "ultimo_acceso": "12 días 16 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Dorothea Hecke",
+    "email": "dorohecke@gmail.com",
+    "ultimo_acceso": "17 días 23 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Yenny Henriquez",
+    "email": "yhenriquez.v@gmail.com",
+    "ultimo_acceso": "20 días 12 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Nathalie Nicole Herrera Cancino",
+    "email": "herreranathalien@gmail.com",
+    "ultimo_acceso": "14 días 1 hora",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Catalina Jara",
+    "email": "catalina.jara.vasquez@outlook.com",
+    "ultimo_acceso": "17 días 21 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Carolina Jarpa Millán",
+    "email": "carolina.jarpam@gmail.com",
+    "ultimo_acceso": "18 días 13 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "María José Letelier Brito",
+    "email": "mj.letelierbrito@gmail.com",
+    "ultimo_acceso": "19 días 17 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Hans Rudolf Werner Liechti",
+    "email": "hansliechti@gmail.com",
+    "ultimo_acceso": "18 días 16 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 60,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Catalina Luengo",
+    "email": "luengocv@gmail.com",
+    "ultimo_acceso": "20 días 11 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Jesus Maldonado Asencio",
+    "email": "juezeth@gmail.com",
+    "ultimo_acceso": "14 días 2 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Jaime Maldonado González",
+    "email": "jaimeignacio.maldonado28@gmail.com",
+    "ultimo_acceso": "14 días 15 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Thalya Mansilla Miranda",
+    "email": "thalya.mansilla@hotmail.com",
+    "ultimo_acceso": "3 días 15 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "André mardones morales",
+    "email": "mardones.morales@gmail.com",
+    "ultimo_acceso": "19 días 17 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Pablo Mardones Rojas",
+    "email": "pablomardonesrojas@gmail.com",
+    "ultimo_acceso": "12 días 19 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Gabriel Maureira",
+    "email": "gabo.maureira95@gmail.com",
+    "ultimo_acceso": "20 días 19 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Silvestre Mellado",
+    "email": "ing.melladocampos@gmail.com",
+    "ultimo_acceso": "20 días 15 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Alexis Mena",
+    "email": "alexismena08@gmail.com",
+    "ultimo_acceso": "11 días 1 hora",
+    "inactivo_critico": false,
+    "avance_porcentaje": 80,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Khatrina Mariel Meneses Pino",
+    "email": "khatrinamariel@gmail.com",
+    "ultimo_acceso": "14 días 16 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Cristina Mocsary",
+    "email": "crisvilla03@yahoo.com.ar",
+    "ultimo_acceso": "20 días",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Cesia Montecinos Lara",
+    "email": "mml.cesia@gmail.com",
+    "ultimo_acceso": "14 días 5 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Monserrat Muñoz",
+    "email": "monserratsofiam@gmail.com",
+    "ultimo_acceso": "20 días 9 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Mayra Mura",
+    "email": "mayra.mura.ahumada@gmail.com",
+    "ultimo_acceso": "19 días 20 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Eliecer Ñancufil",
+    "email": "eliecer.nancufil@conaf.cl",
+    "ultimo_acceso": "2 días 18 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Paola Navarrete",
+    "email": "navarretezamorano@gmail.com",
+    "ultimo_acceso": "20 días 14 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Yanina Navarro",
+    "email": "yaninaalejandra.21@gmail.com",
+    "ultimo_acceso": "18 días 22 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Francisca Neira Muñoz",
+    "email": "franciscaneiramunoz@gmail.com",
+    "ultimo_acceso": "12 días 23 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Giselle Norambuena Pardo",
+    "email": "gnorambuenapardo@gmail.com",
+    "ultimo_acceso": "20 días 9 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Marisol Paz Oporto Fuentes",
+    "email": "marisoloporto@gmail.com",
+    "ultimo_acceso": "5 días 9 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "María Ignacia Padilla Silva",
+    "email": "mignaciapadilla@gmail.com",
+    "ultimo_acceso": "19 días 23 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Diego Peñaloza Madrid",
+    "email": "dpenaloza.mv@gmail.com",
+    "ultimo_acceso": "14 días 7 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Cristóbal Pérez López",
+    "email": "cristobalperezepol@gmail.com",
+    "ultimo_acceso": "13 días 12 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Constanza Perez Merida",
+    "email": "coniperezmerida@gmail.com",
+    "ultimo_acceso": "15 días 2 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Alejandra Pizarro Espejo",
+    "email": "ale.pizarro18@gmail.com",
+    "ultimo_acceso": "18 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "XENIA PLASENCIO",
+    "email": "xplasencio@gmail.com",
+    "ultimo_acceso": "12 días 16 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Hernan Pulgar",
+    "email": "hpulgarpinaud@gmail.com",
+    "ultimo_acceso": "14 días 9 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "catalina Quezada zamorano",
+    "email": "cataquezada2005@gmail.com",
+    "ultimo_acceso": "14 días 13 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Gonzalo Quintero Gómez",
+    "email": "gonzoq@gmail.com",
+    "ultimo_acceso": "17 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Moises Rain",
+    "email": "rainmm92@gmail.com",
+    "ultimo_acceso": "7 días 10 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "El Sharif Ramires Provoste",
+    "email": "elsharif.pg@gmail.com",
+    "ultimo_acceso": "13 días 12 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "PAULA ROJAS VALDIVIA",
+    "email": "paulaesperanza11@gmail.com",
+    "ultimo_acceso": "5 días 22 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 80,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Daniel Ernesto Romero Rodriguez",
+    "email": "romeroprofebibliotecario@gmail.com",
+    "ultimo_acceso": "17 días 22 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Marley Romero Zerpa",
+    "email": "romerozerpamarley@gmail.com",
+    "ultimo_acceso": "17 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Maria Jose Rosales",
+    "email": "m.jose.rosales@gmail.com",
+    "ultimo_acceso": "19 días 12 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Marcela Salazar Olivares",
+    "email": "marcela.mascontrol@gmail.com",
+    "ultimo_acceso": "18 días 11 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Margarita Sanchez Losada",
+    "email": "margarita.sanchez@alumnos.ulagos.cl",
+    "ultimo_acceso": "20 días 19 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Diego ánchez Véliz",
+    "email": "diego.sanchezv@estudiantes.uv.cl",
+    "ultimo_acceso": "20 días 18 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Kiara Sandoval Dunn",
+    "email": "sandovaldunnkiara@gmail.com",
+    "ultimo_acceso": "19 días 17 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Catalina Sandoval Urzúa",
+    "email": "caatalinaasandoval@gmail.com",
+    "ultimo_acceso": "19 días 14 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 40,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Karola Soto Mena",
+    "email": "karo.sm88@gmail.com",
+    "ultimo_acceso": "17 días 13 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 20,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Ignacio Tapia",
+    "email": "igna.nuneztapia11@gmail.com",
+    "ultimo_acceso": "18 días 9 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Jerelyn Tello Olivares",
+    "email": "nenitatello14tello@gmail.com",
+    "ultimo_acceso": "4 días 14 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Carolina Torres",
+    "email": "carolina.torres@alumnos.uaysen.cl",
+    "ultimo_acceso": "13 días 10 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Romina Uribe Chávez",
+    "email": "ruribech@gmail.com",
+    "ultimo_acceso": "20 días 16 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  },
+  {
+    "nombre": "Mariana Urrutia",
+    "email": "marianaurrutiat@gmail.com",
+    "ultimo_acceso": "13 días 15 horas",
+    "inactivo_critico": false,
+    "avance_porcentaje": 100,
+    "tiene_certificado": true,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": true
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": true
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": true
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": true
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": true
+      }
+    }
+  },
+  {
+    "nombre": "Maria Francisca Zuñiga",
+    "email": "mariafrancisca.zuniga@gmail.com",
+    "ultimo_acceso": "17 días 19 horas",
+    "inactivo_critico": true,
+    "avance_porcentaje": 0,
+    "tiene_certificado": false,
+    "detalle_modulos": {
+      "programa": {
+        "nombre_moodle": "Programa del curso",
+        "finalizado": false
+      },
+      "inscripcion": {
+        "nombre_moodle": "Encuesta de Inscripción",
+        "finalizado": false
+      },
+      "curso": {
+        "nombre_moodle": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+        "finalizado": false
+      },
+      "satisfaccion": {
+        "nombre_moodle": "Encuesta de satisfacción",
+        "finalizado": false
+      },
+      "certificado": {
+        "nombre_moodle": "Certificado",
+        "finalizado": false
+      }
+    }
+  }
+];
+        window.ACTIVITIES_DETECTED = [
+  {
+    "key": "programa",
+    "originalHeader": "Programa del curso",
+    "label": "Programa del curso"
+  },
+  {
+    "key": "inscripcion",
+    "originalHeader": "Encuesta de Inscripción",
+    "label": "Encuesta de Inscripción"
+  },
+  {
+    "key": "curso",
+    "originalHeader": "Curso: Chile y la conservación: 100 años de decisiones para proteger el territorio",
+    "label": "Curso Principal"
+  },
+  {
+    "key": "satisfaccion",
+    "originalHeader": "Encuesta de satisfacción",
+    "label": "Encuesta de Satisfacción"
+  },
+  {
+    "key": "certificado",
+    "originalHeader": "Certificado",
+    "label": "Certificado Emitido"
+  }
+]; /*DATA_EMBEDDED*/</script>
+
+    <script>
+        let parsedParticipants = [];
+        let parsedProgress = [];
+        let activeTab = 'accesos';
+        let subfilterAccesos = 'todos';
+        let subfilterProgreso = 'todos';
+        window.ACTIVITIES_DETECTED = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            if (Array.isArray(ALUMNOS_DATA) && ALUMNOS_DATA.length > 0) {
+                document.getElementById('setup-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                inicializarDashboard(ALUMNOS_DATA);
+            } else {
+                document.getElementById('setup-view').classList.remove('hidden');
+                document.getElementById('dashboard-view').classList.add('hidden');
+                inicializarGenerador();
+            }
+        });
+
+        function inicializarGenerador() {
+            setupDragAndDrop('dropzone-participants', 'file-participants', (data) => {
+                parsedParticipants = parseParticipantsCSV(data);
+                if(parsedParticipants.length > 0) {
+                    document.getElementById('label-participants').innerHTML = `<span class="text-emerald-600 font-bold">✓ Éxito</span> (${parsedParticipants.length} alumnos leídos)`;
+                } else {
+                    // Fallback visual en caso de que el archivo esté completamente vacío o corrupto
+                    const preview = data.substring(0, 80).replace(/</g, '&lt;');
+                    document.getElementById('label-participants').innerHTML = `<span class="text-rose-600 font-bold">Error: No se detectaron correos.</span><br><span class="text-[10px] text-slate-400 mt-2 block break-all leading-tight">Revise formato. Lectura inicial: ${preview}...</span>`;
+                }
+                verificarArchivosListos();
+            });
+
+            setupDragAndDrop('dropzone-progress', 'file-progress', (data) => {
+                parsedProgress = parseProgressCSV(data);
+                if(parsedProgress.length > 0){
+                    document.getElementById('label-progress').innerHTML = `<span class="text-emerald-600 font-bold">✓ Éxito</span> (${parsedProgress.length} registros)`;
+                } else {
+                    document.getElementById('label-progress').innerHTML = `<span class="text-rose-600 font-bold">Error: Archivo vacío o ilegible.</span>`;
+                }
+                verificarArchivosListos();
+            });
+        }
+
+        function setupDragAndDrop(zoneId, inputId, callback) {
+            const zone = document.getElementById(zoneId);
+            const input = document.getElementById(inputId);
+            zone.addEventListener('click', () => input.click());
+            input.addEventListener('change', (e) => { if (e.target.files.length > 0) leerArchivo(e.target.files[0], callback); });
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('bg-emerald-50/50'); });
+            zone.addEventListener('dragleave', () => { zone.classList.remove('bg-emerald-50/50'); });
+            zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('bg-emerald-50/50'); if (e.dataTransfer.files.length > 0) leerArchivo(e.dataTransfer.files[0], callback); });
+        }
+
+        function leerArchivo(file, callback) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let text = e.target.result;
+                text = text.replace(/\0/g, ''); // Limpiar caracteres nulos invisibles de Excel
+                callback(text);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function parseCSVLineRobust(text, separator) {
+            const result = [];
+            let current = "";
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (inQuotes) {
+                    if (char === '"' && text[i+1] === '"') { current += '"'; i++; }
+                    else if (char === '"') { inQuotes = false; }
+                    else { current += char; }
+                } else if (char === '"') {
+                    inQuotes = true;
+                } else if (char === separator) {
+                    result.push(current.trim());
+                    current = "";
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function detectSeparatorRobust(text) {
+            const sample = text.split(/\r\n|\n|\r/).filter(l => l.trim().length > 0).slice(0, 8).join('\n');
+            const tabCount = (sample.match(/\t/g) || []).length;
+            const semiCount = (sample.match(/;/g) || []).length;
+            const commaCount = (sample.match(/,/g) || []).length;
+            
+            if (tabCount >= semiCount && tabCount >= commaCount && tabCount > 0) return '\t';
+            if (semiCount >= commaCount && semiCount > 0) return ';';
+            if (commaCount > 0) return ',';
+            return ';';
+        }
+
+        function parseParticipantsCSV(text) {
+            const lines = text.split(/\r\n|\n|\r/);
+            const results = [];
+            const separator = detectSeparatorRobust(text);
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                // Solo procesamos líneas que contengan un correo electrónico válido
+                if (!line || !line.includes('@')) continue;
+
+                const cols = parseCSVLineRobust(line, separator);
+                
+                let email = "";
+                let nombre = "";
+                let acceso = "Nunca";
+
+                // 1. Buscar columna con email
+                const emailIdx = cols.findIndex(c => c.includes('@'));
+                if (emailIdx !== -1) {
+                    const emailMatch = cols[emailIdx].match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                    email = emailMatch ? emailMatch[0].trim().toLowerCase() : cols[emailIdx].trim().toLowerCase();
+                    
+                    // 2. Extraer nombre: si viene como "Seleccionar 'Nombre Apellido'", tomar lo que está entre comillas
+                    const selectMatch = cols[0].match(/(?:seleccionar|select)\s*['"“](.+?)['"”]/i);
+                    if (selectMatch) {
+                        nombre = selectMatch[1].trim();
+                    } else if (emailIdx > 0) {
+                        nombre = cols[0].replace(/^(?:seleccionar|select)\s+/i, '').trim();
+                    } else {
+                        nombre = cols.length > 1 ? cols[1].trim() : "Alumno";
+                    }
+
+                    // Limpieza de etiquetas de rol o estado que puedan colarse
+                    nombre = nombre.replace(/(?:\b|_)(estudiante|student|alumno)(?:\b|_)/gi, ' ').trim();
+                    nombre = nombre.replace(/(?:\b|_)(s activo|activo|inactivo|s)(?:\b|_)/gi, ' ').trim();
+                    nombre = nombre.replace(/^['"\s]+|['"\s]+$/g, '').trim();
+                    nombre = nombre.replace(/\s+/g, ' ').trim(); 
+                    
+                    if (!nombre) nombre = "Alumno";
+
+                    // 3. Buscar el tiempo de último acceso en las columnas restantes
+                    for (let j = 0; j < cols.length; j++) {
+                        if (j === emailIdx) continue;
+                        const val = cols[j].trim();
+                        const valLower = val.toLowerCase();
+                        
+                        // Omitir columnas con roles, grupos o estados
+                        if (!val || valLower === 'estudiante' || valLower === 'student' || valLower === 'alumno' || valLower === 'sin grupo') continue;
+                        
+                        if (valLower === 'nunca' || valLower === 'never') {
+                            acceso = val;
+                        } else if (valLower.includes('ahora') || valLower.includes('segundo') || valLower.includes('seg') ||
+                                   valLower.includes('min') || valLower.includes('hora') || valLower.includes('día') || 
+                                   valLower.includes('dia') || valLower.includes('mes') || valLower.includes('año') || 
+                                   valLower.includes('hace') || (/\d/.test(valLower) && (valLower.includes('/') || valLower.includes('-') || valLower.includes('de ')))) {
+                            acceso = val;
+                        }
+                    }
+
+                    results.push({
+                        nombre: nombre,
+                        email: email,
+                        ultimo_acceso: acceso,
+                        status: 'Activo',
+                        group: 'N/A'
+                    });
+                }
+            }
+            return results;
+        }
+
+        function parseProgressCSV(text) {
+            const lines = text.split(/\r\n|\n|\r/);
+            if (lines.length < 2) return [];
+            
+            const separator = detectSeparatorRobust(text);
+            const header = lines[0].split(separator).map(h => h.replace(/["']/g, '').trim());
+            const results = [];
+            
+            let emailIdx = header.findIndex(h => h.toLowerCase().includes('correo') || h.toLowerCase() === 'email');
+            if (emailIdx === -1) emailIdx = 1; 
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const cols = line.split(separator).map(c => c.replace(/["']/g, '').trim());
+                
+                let email = cols[emailIdx] ? cols[emailIdx].toLowerCase() : '';
+                if (!email || !email.includes('@')) {
+                    const rowText = cols.join(' ');
+                    const eMatch = rowText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                    if (eMatch) email = eMatch[0].toLowerCase();
+                }
+
+                if (!email) continue;
+
+                const item = {};
+                header.forEach((colName, index) => { item[colName || `col_${index}`] = cols[index] || ''; });
+                results.push({ email: email, raw: item });
+            }
+            return results;
+        }
+
+        function verificarArchivosListos() {
+            const btnDescarga = document.getElementById('btn-descargar-final');
+            const statusBox = document.getElementById('status-box');
+            if (parsedParticipants.length > 0 && parsedProgress.length > 0) {
+                btnDescarga.removeAttribute('disabled');
+                statusBox.className = "p-4 rounded-xl text-sm font-semibold text-center bg-emerald-100 text-emerald-800";
+                statusBox.textContent = "¡Archivos detectados y listos!";
+                statusBox.classList.remove('hidden');
+            }
+        }
+
+        function detectarActividades(keys) {
+            const list = [];
+            for (let i = 0; i < keys.length; i++) {
+                const col = keys[i];
+                const lowerCol = col.toLowerCase().trim();
+                
+                if (!col || col.startsWith("col_") || lowerCol.includes("correo") || lowerCol.includes("nombre")) continue;
+                
+                let key = null; let label = "";
+                // Mapeo exacto a los 5 recursos específicos del curso
+                if (lowerCol.includes("programa") && lowerCol.includes("curso")) { key = "programa"; label = "Programa del curso"; }
+                else if (lowerCol.includes("inscrip")) { key = "inscripcion"; label = "Encuesta de Inscripción"; }
+                else if (lowerCol.includes("satisfac")) { key = "satisfaccion"; label = "Encuesta de Satisfacción"; }
+                else if (lowerCol.includes("certif")) { key = "certificado"; label = "Certificado Emitido"; }
+                else if (lowerCol.includes("chile") && lowerCol.includes("conservaci")) { key = "curso"; label = "Curso Principal"; }
+                
+                if (key) {
+                    list.push({ key: key, originalHeader: col, label: label });
+                }
+            }
+            return list;
+        }
+
+        function procesarDatosConsolidados() {
+            if (!parsedParticipants || parsedParticipants.length === 0 || !parsedProgress || parsedProgress.length === 0) return [];
+
+            const headerKeys = Object.keys(parsedProgress[0].raw);
+            window.ACTIVITIES_DETECTED = detectarActividades(headerKeys);
+
+            const progressMap = {};
+            parsedProgress.forEach(p => { progressMap[p.email] = p; });
+
+            const alumnosFinales = [];
+
+            // La lista maestra siempre es el archivo de participantes (Ej. 53 alumnos)
+            parsedParticipants.forEach(part => {
+                const email = part.email;
+                const prog = progressMap[email] || { raw: {} }; 
+                const rawObj = prog.raw;
+
+                let completadosCount = 0;
+                const detalleModulos = {};
+
+                window.ACTIVITIES_DETECTED.forEach(act => {
+                    const estadoVal = rawObj[act.originalHeader] || "";
+                    const lowerEstado = estadoVal.toLowerCase().trim();
+                    
+                    let esFinalizado = false;
+                    // Filtro estricto para no contabilizar textos engañosos como "No finalizado" o "Sin finalizar"
+                    if (lowerEstado && lowerEstado !== '-' && !lowerEstado.includes("no finalizado") && !lowerEstado.includes("sin finalizar") && !lowerEstado.includes("no completado")) {
+                        if (lowerEstado.includes("finalizado") || lowerEstado.includes("completado") || /\bsí\b/.test(lowerEstado) || /\bsi\b/.test(lowerEstado) || /\d/.test(lowerEstado)) {
+                            esFinalizado = true;
+                        }
+                    }
+                    
+                    if (esFinalizado) completadosCount++;
+                    detalleModulos[act.key] = {
+                        nombre_moodle: act.originalHeader,
+                        finalizado: esFinalizado
+                    };
+                });
+
+                // Lógica del semáforo basada en el acceso real capturado
+                const accesoStr = part.ultimo_acceso.toLowerCase();
+                let inactivoCritico = false;
+                
+                if (accesoStr.includes("nunca")) {
+                    inactivoCritico = true;
+                } else {
+                    const diasMatch = accesoStr.match(/(\d+)\s*d[ií]a/);
+                    if (diasMatch && parseInt(diasMatch[1]) > 15) {
+                        inactivoCritico = true; // Rojo si pasaron más de 15 días
+                    }
+                }
+
+                const totalActividades = window.ACTIVITIES_DETECTED.length;
+                const porcentajeAvance = totalActividades > 0 ? Math.round((completadosCount / totalActividades) * 100) : 0;
+
+                alumnosFinales.push({
+                    nombre: part.nombre,
+                    email: email,
+                    ultimo_acceso: part.ultimo_acceso,
+                    inactivo_critico: inactivoCritico,
+                    avance_porcentaje: porcentajeAvance,
+                    tiene_certificado: detalleModulos["certificado"] ? detalleModulos["certificado"].finalizado : false,
+                    detalle_modulos: detalleModulos
+                });
+            });
+
+            return alumnosFinales;
+        }
+
+        function procesarYPrevisualizar() {
+            try {
+                const datos = procesarDatosConsolidados();
+                if (!datos || datos.length === 0) {
+                    document.getElementById('status-box').innerHTML = "<span class='text-rose-600 font-bold'>Error: No se lograron cruzar los datos.</span>";
+                    document.getElementById('status-box').classList.remove('hidden');
+                    return;
+                }
+                window.DYNAMIC_DATA = datos;
+                document.getElementById('setup-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.getElementById('btn-volver-generador').classList.remove('hidden');
+                inicializarDashboard(datos);
+            } catch(e) {
+                console.error(e);
+                alert("Ocurrió un error procesando los archivos.");
+            }
+        }
+
+        function mostrarGenerador() {
+            document.getElementById('setup-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+        }
+
+        function exportarHTMLCliente() {
+            const datos = procesarDatosConsolidados();
+            if (!datos || datos.length === 0) return;
+            const originalHTML = document.documentElement.outerHTML;
+            const dataString = `const ALUMNOS_DATA = ${JSON.stringify(datos, null, 2)};\n        window.ACTIVITIES_DETECTED = ${JSON.stringify(window.ACTIVITIES_DETECTED, null, 2)};`;
+            let htmlModificado = originalHTML.replace(/\/\*DATA_EMBEDDED\*\/[\s\S]*?\/\*DATA_EMBEDDED\*\//, `/*DATA_EMBEDDED*/ ${dataString} /*DATA_EMBEDDED*/`);
+            const blob = new Blob([htmlModificado], { type: 'text/html;charset=utf-8' });
+            const tempLink = document.createElement('a');
+            tempLink.href = URL.createObjectURL(blob);
+            tempLink.download = 'dashboard_SBAP_cliente.html';
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+        }
+
+        let renderData = [];
+
+        function inicializarDashboard(datos) {
+            renderData = datos;
+            if (window.ACTIVITIES_DETECTED.length === 0 && datos.length > 0) {
+                const p = datos[0].detalle_modulos;
+                const list = [];
+                Object.keys(p).forEach(k => { list.push({ key: k, originalHeader: p[k].nombre_moodle, label: k }); });
+                window.ACTIVITIES_DETECTED = list;
+            }
+            calcularKPIs(datos);
+            renderTables();
+        }
+
+        function calcularKPIs(datos) {
+            const total = datos.length;
+            const inscripciones = datos.filter(a => a.detalle_modulos.inscripcion && a.detalle_modulos.inscripcion.finalizado).length;
+            const satisfacciones = datos.filter(a => a.detalle_modulos.satisfaccion && a.detalle_modulos.satisfaccion.finalizado).length;
+            const certificados = datos.filter(a => a.tiene_certificado).length;
+
+            document.getElementById('kpi-total').textContent = total;
+            document.getElementById('kpi-inscripcion').textContent = inscripciones;
+            document.getElementById('kpi-inscripcion-porc').textContent = total > 0 ? `(${Math.round((inscripciones/total)*100)}%)` : '(0%)';
+            document.getElementById('kpi-satisfaccion').textContent = satisfacciones;
+            document.getElementById('kpi-satisfaccion-porc').textContent = total > 0 ? `(${Math.round((satisfacciones/total)*100)}%)` : '(0%)';
+            document.getElementById('kpi-certificados').textContent = certificados;
+            document.getElementById('kpi-certificados-porc').textContent = total > 0 ? `(${Math.round((certificados/total)*100)}%)` : '(0%)';
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            const btnAcc = document.getElementById('tab-btn-accesos');
+            const btnProg = document.getElementById('tab-btn-progreso');
+            const secAcc = document.getElementById('section-accesos');
+            const secProg = document.getElementById('section-progreso');
+
+            if (tab === 'accesos') {
+                btnAcc.className = "flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm bg-white text-brand-sbap";
+                btnProg.className = "flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-brand-sbap";
+                secAcc.classList.remove('hidden');
+                secProg.classList.add('hidden');
+            } else {
+                btnProg.className = "flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm bg-white text-brand-sbap";
+                btnAcc.className = "flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-brand-sbap";
+                secProg.classList.remove('hidden');
+                secAcc.classList.add('hidden');
+            }
+            renderTables();
+        }
+
+        function setAccessSubfilter(val) {
+            subfilterAccesos = val;
+            ['todos', 'recientes', 'alertas'].forEach(f => {
+                const btn = document.getElementById(`sub-acc-${f}`);
+                btn.className = f === val ? "px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-sbap text-white" : "px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
+            });
+            renderTables();
+        }
+
+        function setProgressSubfilter(val) {
+            subfilterProgreso = val;
+            [['todos', 'sub-prog-todos'], ['certificado', 'sub-prog-certificado'], ['en-curso', 'sub-prog-en-curso']].forEach(([key, id]) => {
+                const btn = document.getElementById(id);
+                btn.className = key === val ? "px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-sbap text-white" : "px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
+            });
+            renderTables();
+        }
+
+        function applyFilters() { renderTables(); }
+
+        function obtenerDatosFiltrados() {
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            return renderData.filter(a => {
+                if (search && !a.nombre.toLowerCase().includes(search) && !a.email.toLowerCase().includes(search)) return false;
+                
+                if (activeTab === 'accesos') {
+                    const accLower = a.ultimo_acceso.toLowerCase();
+                    const isNunca = accLower.includes("nunca");
+                    if (subfilterAccesos === 'recientes') return !isNunca && !a.inactivo_critico;
+                    if (subfilterAccesos === 'alertas') return a.inactivo_critico || isNunca;
+                }
+                
+                if (activeTab === 'progreso') {
+                    if (subfilterProgreso === 'certificado') return a.tiene_certificado;
+                    if (subfilterProgreso === 'en-curso') return a.avance_porcentaje > 0 && !a.tiene_certificado;
+                }
+                return true;
+            });
+        }
+
+        function renderTables() {
+            const filtrados = obtenerDatosFiltrados();
+            if (activeTab === 'accesos') renderAccesos(filtrados);
+            else renderProgreso(filtrados);
+            lucide.createIcons();
+        }
+
+        function renderAccesos(datos) {
+            const tbody = document.getElementById('table-body-accesos');
+            tbody.innerHTML = '';
+            
+            datos.forEach(alumno => {
+                let badgeSemaforo = '';
+                const isNunca = alumno.ultimo_acceso.toLowerCase().includes("nunca");
+
+                if (isNunca) {
+                    badgeSemaforo = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>Inactivo Crítico (Nunca)</span>`;
+                } else if (alumno.inactivo_critico) {
+                    badgeSemaforo = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>Ausente (> 15 días)</span>`;
+                } else {
+                    badgeSemaforo = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>Activo</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition duration-150 border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-semibold text-slate-800 capitalize">${alumno.nombre}</td>
+                    <td class="py-4 px-6 text-slate-500 font-mono text-xs">${alumno.email}</td>
+                    <td class="py-4 px-6 text-slate-600 font-medium">${alumno.ultimo_acceso}</td>
+                    <td class="py-4 px-6">${badgeSemaforo}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderProgreso(datos) {
+            const tbody = document.getElementById('table-body-progreso');
+            tbody.innerHTML = '';
+            const actStruct = window.ACTIVITIES_DETECTED || [];
+
+            datos.forEach(alumno => {
+                let badgesHtml = '<div class="flex space-x-1 text-xs">';
+                actStruct.forEach(act => {
+                    const info = alumno.detalle_modulos[act.key];
+                    if (!info || act.key === "certificado") return; 
+
+                    let label = "M"; 
+                    let colorClass = info.finalizado ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-100 text-slate-400 border border-slate-200';
+                    
+                    if (act.key === "programa") { label = "P"; colorClass = info.finalizado ? 'bg-teal-600 text-white shadow-sm' : colorClass; }
+                    else if (act.key === "inscripcion") { label = "I"; colorClass = info.finalizado ? 'bg-blue-500 text-white shadow-sm' : colorClass; }
+                    else if (act.key === "satisfaccion") { label = "S"; colorClass = info.finalizado ? 'bg-purple-500 text-white shadow-sm' : colorClass; }
+                    else if (act.key === "curso") { label = "C"; colorClass = info.finalizado ? 'bg-indigo-500 text-white shadow-sm' : colorClass; }
+                    
+                    badgesHtml += `<span title="${act.originalHeader}" class="w-6 h-6 rounded flex items-center justify-center font-bold transition-all ${colorClass}">${label}</span>`;
+                });
+                badgesHtml += '</div>';
+
+                const certHtml = alumno.tiene_certificado 
+                    ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 shadow-sm"><i data-lucide="award" class="w-3.5 h-3.5 mr-1 text-amber-600"></i>Sí</span>`
+                    : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-400">No emitido</span>`;
+
+                let barColor = alumno.avance_porcentaje >= 100 ? 'bg-amber-500' : (alumno.avance_porcentaje >= 50 ? 'bg-emerald-600' : 'bg-emerald-400');
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-4 px-6"><div class="font-semibold text-slate-800 capitalize">${alumno.nombre}</div><div class="text-slate-400 text-xs">${alumno.email}</div></td>
+                    <td class="py-4 px-6"><div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="${barColor} h-full transition-all" style="width: ${alumno.avance_porcentaje}%"></div></div></td>
+                    <td class="py-4 px-6 text-center font-bold text-slate-700">${alumno.avance_porcentaje}%</td>
+                    <td class="py-4 px-6">${badgesHtml}</td>
+                    <td class="py-4 px-6 text-center">${certHtml}</td>
+                    <td class="py-4 px-6 text-center"><button onclick="verDetalle('${alumno.email}')" class="inline-flex items-center px-3 py-1.5 bg-brand-sbap text-white hover:bg-brand-900 rounded-lg text-xs font-semibold shadow-sm transition"><i data-lucide="eye" class="w-3.5 h-3.5 mr-1"></i><span>Ficha</span></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function verDetalle(email) {
+            const dataToUse = window.DYNAMIC_DATA || ALUMNOS_DATA;
+            const alumno = dataToUse.find(a => a.email === email);
+            if (!alumno) return;
+            
+            document.getElementById('modal-nombre').textContent = alumno.nombre;
+            document.getElementById('modal-nombre').classList.add("capitalize");
+            document.getElementById('modal-email').textContent = alumno.email;
+            document.getElementById('modal-ultimo-acc').textContent = alumno.ultimo_acceso;
+            
+            const list = document.getElementById('modal-modulos-list');
+            list.innerHTML = '';
+            
+            (window.ACTIVITIES_DETECTED || []).forEach(act => {
+                const info = alumno.detalle_modulos[act.key];
+                if (!info) return;
+                
+                const check = info.finalizado ? `<div class="bg-emerald-500 text-white rounded-full p-0.5 z-10 shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>` : `<div class="bg-slate-100 text-slate-300 rounded-full p-0.5 z-10 border border-slate-200"><i data-lucide="clock" class="w-3.5 h-3.5"></i></div>`;
+                const text = info.finalizado ? `<span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Completado</span>` : `<span class="text-xs text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded">Pendiente</span>`;
+                
+                const div = document.createElement('div');
+                div.className = "relative flex items-start space-x-3";
+                div.innerHTML = `<div class="absolute left-0 transform -translate-x-[21px] mt-1">${check}</div><div class="flex-1"><h5 class="text-sm font-semibold text-slate-700">${act.originalHeader}</h5><div class="mt-1">${text}</div></div>`;
+                list.appendChild(div);
+            });
+            document.getElementById('modal-detalle').classList.remove('hidden');
+            lucide.createIcons();
+        }
+        function closeModal() { document.getElementById('modal-detalle').classList.add('hidden'); }
+    </script>
+
+</body></html>
