@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lector Educativo Inclusivo - Liceo San Felipe Benicio</title>
+    <!-- Bibliotecas externas estables -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        :root {
+            --bg-canvas: #f2f2f2;
+            --surface: #ffffff;
+            --text-main: #1a1a1b;
+            --gold-primary: #ffd700;
+            --gold-hover: #e6c200;
+            --dark-btn: #1a1a1b;
+            --dark-btn-hover: #333336;
+            --dark-btn-text: #ffffff;
+            --blue-accent: #1d4ed8;
+            --border-ui: #d1d5db;
+            --highlight-bg: #ffeb3b;
+            --highlight-text: #000000;
+            --font-scale: 18px;
+        }
+
+        .high-contrast {
+            --bg-canvas: #000000;
+            --surface: #121212;
+            --text-main: #ffffff;
+            --gold-primary: #ff9900;
+            --gold-hover: #cc7a00;
+            --dark-btn: #ffffff;
+            --dark-btn-hover: #e5e5e5;
+            --dark-btn-text: #000000;
+            --blue-accent: #38bdf8;
+            --border-ui: #ffffff;
+            --highlight-bg: #00ff00;
+            --highlight-text: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: var(--font-scale);
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            margin: 0;
+            padding: 8px 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-sheet {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            padding: 8px 12px;
+            overflow: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-ui);
+            margin-bottom: 8px;
+            flex-shrink: 0;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .brand-divider {
+            width: 2px;
+            height: 34px;
+            background-color: var(--gold-primary);
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .brand-title {
+            font-size: 0.9em;
+            font-weight: 800;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .brand-sub {
+            font-size: 0.75em;
+            color: #4b5563;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .high-contrast .brand-sub {
+            color: #d1d5db;
+        }
+
+        .accessibility-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .app-container.tablet-mode {
+            grid-template-columns: 1fr !important;
+            overflow-y: auto;
+        }
+        
+        .app-container.exam-fullscreen {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border-ui);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .doc-viewer {
+            flex: 1;
+            border: 2px solid var(--border-ui);
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            background: #ffffff;
+            color: #000000;
+            font-size: 1em;
+            line-height: 1.6;
+            min-height: 180px;
+            text-align: justify;
+        }
+
+        .high-contrast .doc-viewer {
+            background: #000000 !important;
+            color: #ffffff !important;
+            border-color: var(--gold-primary) !important;
+        }
+
+        .high-contrast .doc-viewer p, 
+        .high-contrast .doc-viewer span,
+        .high-contrast .doc-viewer div {
+            color: inherit;
+        }
+
+        .doc-viewer img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            border-radius: 6px;
+        }
+
+        .read-word {
+            transition: background-color 0.1s ease, color 0.1s ease;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
+        .highlight-active {
+            background-color: var(--highlight-bg) !important;
+            color: var(--highlight-text) !important;
+            font-weight: bold;
+            outline: 2px solid #d97706;
+        }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-ui);
+            border-radius: 8px;
+            font-size: 1em;
+            resize: none;
+            min-height: 100px;
+            background: var(--surface);
+            color: var(--text-main);
+            font-family: inherit;
+        }
+
+        button {
+            background-color: var(--dark-btn);
+            color: var(--dark-btn-text);
+            border: none;
+            padding: 7px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 700;
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            white-space: nowrap;
+            transition: background-color 0.15s ease, transform 0.05s ease;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:hover { 
+            background-color: var(--dark-btn-hover); 
+        }
+
+        .btn-gold { 
+            background-color: var(--gold-primary) !important; 
+            color: #1a1a1b !important; 
+            border: 1px solid #d4af37 !important; 
+        }
+        .btn-gold:hover { 
+            background-color: var(--gold-hover) !important; 
+        }
+        
+        .btn-danger { 
+            background-color: #dc2626 !important; 
+            color: #ffffff !important; 
+        }
+        .btn-danger:hover { 
+            background-color: #b91c1c !important; 
+        }
+        
+        .btn-success { 
+            background-color: #059669 !important; 
+            color: #ffffff !important; 
+        }
+        .btn-success:hover { 
+            background-color: #047857 !important; 
+        }
+
+        .high-contrast button {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #ffffff !important;
+            font-weight: 800 !important;
+        }
+        .high-contrast button:hover {
+            background-color: #e5e5e5 !important;
+        }
+        .high-contrast .btn-gold {
+            background-color: var(--gold-primary) !important;
+            color: #000000 !important;
+            border: 2px solid #ffffff !important;
+        }
+        .high-contrast .btn-danger {
+            background-color: #ff3333 !important;
+            color: #000000 !important;
+            border: 2px solid #ffffff !important;
+        }
+        .high-contrast .btn-success {
+            background-color: #00e676 !important;
+            color: #000000 !important;
+            border: 2px solid #ffffff !important;
+        }
+
+        @keyframes pulseVoice {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 9px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .btn-voice-active {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+            animation: pulseVoice 1.4s infinite !important;
+            border: 1px solid #991b1b !important;
+        }
+
+        .btn-read-active {
+            background-color: var(--gold-primary) !important;
+            color: #1a1a1b !important;
+            border: 2px solid #1a1a1b !important;
+        }
+
+        select, input[type="range"], input[type="text"], input[type="date"] {
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-ui);
+            font-size: 0.85em;
+            background: var(--surface);
+            color: var(--text-main);
+        }
+
+        .status { font-size: 0.8em; font-style: italic; opacity: 0.85; }
+
+        .exam-compact-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            background: rgba(30, 58, 138, 0.04);
+            border: 1px solid rgba(30, 58, 138, 0.2);
+            padding: 6px 8px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .high-contrast .exam-compact-toolbar {
+            background: #18181b !important;
+            border-color: #ffffff !important;
+        }
+
+        .exam-toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-ui);
+        }
+
+        .math-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+
+        .btn-math {
+            min-height: 28px;
+            padding: 2px 7px;
+            font-family: monospace;
+            font-size: 0.95em;
+            background-color: #4b5563;
+            color: #ffffff;
+        }
+
+        .high-contrast .btn-math {
+            background-color: #27272a !important;
+            color: #ffffff !important;
+            border: 1px solid #ffffff !important;
+        }
+        
+        .exam-input-interactive {
+            border: 1.5px solid #059669;
+            background: #f0fdf4;
+            color: #065f46;
+            font-weight: 700;
+            min-width: 170px;
+            font-size: inherit;
+            padding: 5px 8px;
+            margin: 2px 4px;
+            border-radius: 6px;
+        }
+        .exam-input-interactive:focus {
+            background: #dcfce7 !important;
+            outline: 2px solid #059669 !important;
+        }
+
+        .high-contrast .exam-input-interactive {
+            background: #18181b !important;
+            color: #ffeb3b !important;
+            border: 2px solid #ffeb3b !important;
+        }
+
+        .exam-textarea-interactive {
+            width: 100%;
+            min-height: 80px;
+            border: 2px solid #059669;
+            border-radius: 6px;
+            padding: 8px;
+            background: #f0fdf4;
+            font-family: inherit;
+            font-size: 0.95em;
+            margin-top: 6px;
+            color: #065f46;
+        }
+
+        .high-contrast .exam-textarea-interactive {
+            background: #18181b !important;
+            color: #ffffff !important;
+            border: 2px solid #ffeb3b !important;
+        }
+
+        .exam-checkbox-interactive {
+            margin-right: 6px;
+            transform: scale(1.3);
+            cursor: pointer;
+            accent-color: #059669;
+            vertical-align: middle;
+        }
+
+        .option-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 6px 0 6px 15px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        .option-row:hover { background: rgba(0, 0, 0, 0.04); }
+        .high-contrast .option-row:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .vf-container {
+            display: inline-flex;
+            gap: 14px;
+            margin: 6px 0;
+            background: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+        .high-contrast .vf-container {
+            background: #27272a !important;
+            border: 1px solid #ffffff !important;
+        }
+
+        .file-upload-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+        }
+        .file-upload-btn input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        #preEntryModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background: var(--surface);
+            color: var(--text-main);
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            border: 2px solid var(--gold-primary);
+        }
+
+        .footer-waves-container {
+            margin-top: 6px;
+            padding-top: 2px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .waves-svg {
+            width: 100%;
+            height: 18px;
+            display: block;
+        }
+        .footer-text {
+            font-size: 0.76em;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.6px;
+            padding: 2px 0 0 0;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                padding: 4px;
+            }
+            .main-sheet {
+                border-radius: 8px;
+                padding: 6px;
+                box-shadow: none;
+            }
+            .app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .brand-sub { display: none; }
+        }
+
+        @media print {
+            .no-print, header, .footer-waves-container, .exam-compact-toolbar {
+                display: none !important;
+            }
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+            .main-sheet {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-sheet">
+        <header class="no-print">
+            <div class="brand-section">
+                <img src="https://lsfb.cl/wp-content/uploads/2024/10/cropped-ico3-1.png" alt="Insignia LSFB" class="brand-logo" onerror="this.style.display='none'">
+                <div class="brand-divider"></div>
+                <div class="brand-text">
+                    <span class="brand-title">Liceo San Felipe Benicio</span>
+                    <span class="brand-sub">Lector Educativo Inclusivo</span>
+                </div>
+            </div>
+            <div class="accessibility-controls">
+                <button type="button" onclick="requestExamMode()" id="btnExamToggle" class="btn-gold">📝 Modo Evaluación</button>
+                <button type="button" onclick="toggleLayout()">📱 PC/Tablet</button>
+                <button type="button" onclick="changeFontSize(-2)">A-</button>
+                <button type="button" onclick="changeFontSize(2)">A+</button>
+                <button type="button" onclick="toggleContrast()">👁️ Contraste</button>
+            </div>
+        </header>
+
+        <div id="preEntryModal">
+            <div class="modal-content">
+                <h3 style="margin:0; color: inherit; text-align: center; border-bottom: 2px solid var(--gold-primary); padding-bottom: 6px;">📝 Ingreso a Evaluación</h3>
+                <p style="font-size: 0.85em; margin: 4px 0;">Datos del estudiante:</p>
+                <input type="text" id="studentName" placeholder="Nombre completo">
+                <input type="text" id="studentRut" placeholder="RUT o Identificación">
+                <input type="text" id="studentSubject" placeholder="Asignatura / Curso">
+                <input type="date" id="studentDate">
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button type="button" onclick="confirmExamEntry()" class="btn-success" style="flex: 1;">▶️ Iniciar</button>
+                    <button type="button" onclick="cancelExamEntry()" class="btn-danger" style="flex: 1;">❌ Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-container" id="appContainer">
+            
+            <div class="card" id="readerCard">
+                <h3 style="margin:0; font-size: 1.05em;">1. Lector de Documentos</h3>
+                <input type="file" id="fileInput" accept=".pdf">
+                
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 0.8em; font-weight: bold;">Modo:</label>
+                        <select id="readMode" style="width: 100%;">
+                            <option value="all">📜 Todo</option>
+                            <option value="selection">✂️ Selección</option>
+                            <option value="from-cursor">📍 Cursor</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1.2; min-width: 140px;">
+                        <label style="font-size: 0.8em; font-weight: bold;">Voz:</label>
+                        <select id="voiceSelect" style="width: 100%;"></select>
+                    </div>
+                    <div style="flex: 0.8; min-width: 90px;">
+                        <label style="font-size: 0.8em; font-weight: bold;">Vel: <span id="rateVal">1.0x</span></label>
+                        <input type="range" id="rate" min="0.5" max="1.8" step="0.05" value="1.0" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div id="readStatus" class="status">Cargue un documento PDF...</div>
+                
+                <div id="docViewer" class="doc-viewer" contenteditable="true" placeholder="El texto aparecerá aquí..."></div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 4px; flex: 2;">
+                        <button type="button" id="btnReadAction" onclick="prepareAndRead()" style="flex: 1.2;">▶️ Leer con Marcador</button>
+                        <button type="button" onclick="stopReading()" class="btn-danger" style="flex: 0.8;">⏹️ Detener</button>
+                    </div>
+                    <button type="button" onclick="copySelectionToExam()" class="btn-gold" style="flex: 1.4;">➡️ Enviar a Examen</button>
+                </div>
+            </div>
+
+            <div class="card" id="standardDictationCard">
+                <h3 style="margin:0; font-size: 1.05em;">2. Dictado y Exportación</h3>
+                <div style="background: rgba(29, 78, 216, 0.08); color: var(--text-main); padding: 6px 10px; border-radius: 6px; font-size: 0.8em; border-left: 3px solid var(--blue-accent);">
+                    💡 Presiona <b>"🎤 Dictado Web"</b> para hablar directamente.
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" id="btnStartDict" onclick="startDictationWeb()" style="flex: 1.2;">🎤 Dictado Web</button>
+                    <button type="button" id="btnStopDict" onclick="stopDictationWeb()" class="btn-danger" style="flex: 0.8;" disabled>🛑 Detener</button>
+                    <button type="button" id="btnMathModeDict" onclick="toggleMathDictationMode()" style="background-color: #6d28d9; color: #ffffff;">📐 Math: ON</button>
+                </div>
+                <div id="dictStatus" class="status">Listo para dictar.</div>
+                <textarea id="dictationText" placeholder="El dictado aparecerá aquí..."></textarea>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" onclick="exportWord()" class="btn-gold" style="flex: 1;">💾 Exportar Word</button>
+                    <button type="button" onclick="exportPDF()" style="flex: 1; background-color: #0284c7; color: #ffffff;">📄 Exportar PDF</button>
+                </div>
+            </div>
+
+            <div class="card" id="examPanel" style="display: none; border: 2px solid #059669;">
+                <div class="exam-compact-toolbar">
+                    <div class="file-upload-btn">
+                        <button type="button" class="btn-gold">📂 Cargar Prueba</button>
+                        <input type="file" id="examFileInput" accept=".pdf">
+                    </div>
+
+                    <div class="exam-toolbar-group">
+                        <span style="font-size:0.85em;">⏱️ <b id="timerDisplay">00:00</b></span>
+                        <button type="button" id="btnTimerToggle" onclick="toggleTimer()" style="min-height: 26px; padding: 2px 7px; font-size: 0.8em;">▶️ Iniciar</button>
+                    </div>
+
+                    <div class="exam-toolbar-group" style="border-color: #0284c7;">
+                        <button id="btnStartDictExam" type="button" onclick="startDictationWeb()" style="background-color: #0284c7; color: #ffffff; min-height: 28px;">🎤 Dictar</button>
+                        <button id="btnStopDictExam" type="button" onclick="stopDictationWeb()" class="btn-danger" style="min-height: 28px;" disabled>🛑 Parar</button>
+                        <button id="btnMathModeDictExam" type="button" onclick="toggleMathDictationMode()" style="background-color: #6d28d9; color: #ffffff; min-height: 28px;">📐 Math: ON</button>
+                    </div>
+
+                    <div class="exam-toolbar-group">
+                        <span style="font-size: 0.8em; font-weight: bold;">↔️ Márgenes:</span>
+                        <input type="range" id="docMarginSlider" min="5" max="80" value="15" oninput="updateExamMargins(this.value)" style="width: 70px;">
+                    </div>
+
+                    <div class="exam-toolbar-group" style="flex: 1; min-width: 240px; justify-content: space-between;">
+                        <span style="font-size: 0.8em; font-weight: bold;">∑ Math:</span>
+                        <div class="math-toolbar">
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('+')">+</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('-')">-</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('×')">×</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('÷')">÷</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('=')">=</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol(' : ')">:</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('/')">/</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('√(')">√</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('²')">x²</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('³')">x³</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('½')">½</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('π')">π</button>
+                            <button type="button" class="btn-math" onclick="insertMathSymbol('f(x)=')">f(x)</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 5px; margin-left: auto;">
+                        <button type="button" onclick="addQuestion()" class="btn-success" title="Agregar Bloque Manual">➕ Bloque</button>
+                        <button type="button" onclick="exportExamWord()" class="btn-gold" title="Entregar Examen en Word">💾 Word</button>
+                        <button type="button" onclick="exportExamPDF()" style="background-color: #0284c7; color: #ffffff;" title="Entregar Examen en PDF">📄 PDF</button>
+                    </div>
+                </div>
+
+                <div id="examSaveStatus" class="status" style="color: #059669; font-size: 0.75em; margin-top: -2px;">✔ Respuestas respaldadas automáticamente.</div>
+                <div id="questionsContainer" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 0;"></div>
+            </div>
+
+        </div>
+
+        <footer class="footer-waves-container no-print">
+            <svg viewBox="0 0 1200 45" preserveAspectRatio="none" class="waves-svg">
+                <path d="M0,18 C200,38 400,2 600,20 C800,38 1000,5 1200,22 L1200,45 L0,45 Z" fill="#eaecef"></path>
+                <path d="M0,24 C250,8 500,40 750,22 C1000,6 1120,32 1200,24 L1200,45 L0,45 Z" fill="#1a1a1b" opacity="0.9"></path>
+                <path d="M0,32 C300,16 600,44 850,28 C1050,16 1140,36 1200,30 L1200,45 L0,45 Z" fill="#ffd700"></path>
+            </svg>
+            <div class="footer-text">Liceo San Felipe Benicio - Coyhaique</div>
+        </footer>
+    </div>
+
+    <script>
+        try {
+            if (window.pdfjsLib) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+        } catch (e) {
+            console.warn("PDF.js worker:", e);
+        }
+
+        var activeExamInput = null;
+
+        document.addEventListener('focusin', function(e) {
+            if (e.target && e.target.matches('input, textarea, [contenteditable="true"]')) {
+                activeExamInput = e.target;
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.matches('input, textarea, [contenteditable="true"]')) {
+                saveExamToStorage();
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.matches('input, select')) {
+                saveExamToStorage();
+            }
+        });
+
+        function setActiveExamInput(elem) { activeExamInput = elem; }
+
+        var currentFontSize = 18;
+        function changeFontSize(delta) {
+            currentFontSize = Math.max(12, Math.min(32, currentFontSize + delta));
+            document.documentElement.style.setProperty('--font-scale', currentFontSize + 'px');
+        }
+
+        function toggleContrast() { 
+            document.body.classList.toggle('high-contrast'); 
+        }
+
+        function toggleLayout() { 
+            document.getElementById('appContainer').classList.toggle('tablet-mode'); 
+        }
+
+        var docViewer = document.getElementById('docViewer');
+        var readStatus = document.getElementById('readStatus');
+
+        function formatScientificNotation(text) {
+            if (!text) return text;
+            try {
+                var superscripts = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+                return text
+                    .replace(/10\^(-?\d+)/g, function(match, p1) {
+                        var isNeg = p1.indexOf('-') === 0;
+                        var digits = isNeg ? p1.slice(1) : p1;
+                        var converted = digits.split('').map(function(d) { return superscripts[d] || d; }).join('');
+                        return '10' + (isNeg ? '⁻' : '') + converted;
+                    })
+                    .replace(/\bCH4\b/g, 'CH₄')
+                    .replace(/\bH2O\b/g, 'H₂O')
+                    .replace(/\bFe2O3\b/g, 'Fe₂O₃')
+                    .replace(/\bCO2\b/g, 'CO₂')
+                    .replace(/\bO2\b/g, 'O₂')
+                    .replace(/\bH2\b/g, 'H₂')
+                    .replace(/\bC4H8\b/g, 'C₄H₈')
+                    .replace(/\bC2H6\b/g, 'C₂H₆')
+                    .replace(/\bMnO2\b/g, 'MnO₂')
+                    .replace(/\bCl2\b/g, 'Cl₂')
+                    .replace(/\bKClO3\b/g, 'KClO₃')
+                    .replace(/\bCaCO3\b/g, 'CaCO₃')
+                    .replace(/\bH3PO4\b/g, 'H₃PO₄')
+                    .replace(/\bC4H10\b/g, 'C₄H₁₀')
+                    .replace(/\bC6H12O6\b/g, 'C₆H₁₂O₆');
+            } catch (err) {
+                return text;
+            }
+        }
+
+        async function processFile(file, isExam) {
+            if (!file) return;
+            if (isExam === undefined) isExam = false;
+            readStatus.innerText = "Cargando documento...";
+            var ext = file.name.split('.').pop().toLowerCase();
+
+            try {
+                if (ext === 'txt') {
+                    var text = await file.text();
+                    var parsedHtml = parseExamInteractivity(text);
+                    docViewer.innerHTML = parsedHtml;
+                    if (isExam) autoConvertTextToExam(parsedHtml);
+                } 
+                else if (ext === 'docx') {
+                    var arrayBuffer = await file.arrayBuffer();
+                    var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    var parsedHtml = parseExamInteractivity(result.value);
+                    docViewer.innerHTML = parsedHtml;
+                    if (isExam) autoConvertTextToExam(parsedHtml);
+                } 
+                else if (ext === 'pdf') {
+                    readStatus.innerText = "Procesando documento PDF...";
+                    var arrayBuffer = await file.arrayBuffer();
+                    var loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                    var pdf = await loadingTask.promise;
+                    var fullRawText = '';
+                    
+                    for (var i = 1; i <= pdf.numPages; i++) {
+                        var page = await pdf.getPage(i);
+                        var textContent = await page.getTextContent();
+                        
+                        var pageLines = [];
+                        var currentLine = '';
+                        var lastY = null;
+
+                        for (var k = 0; k < textContent.items.length; k++) {
+                            var item = textContent.items[k];
+                            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 4) {
+                                if (currentLine.trim()) pageLines.push(currentLine.trim());
+                                currentLine = '';
+                            }
+                            currentLine += item.str + (item.hasEOL ? '' : ' ');
+                            lastY = item.transform[5];
+                        }
+                        if (currentLine.trim()) pageLines.push(currentLine.trim());
+
+                        if (pageLines.length > 0) {
+                            fullRawText += '\n[Página ' + i + ']\n' + pageLines.join('\n') + '\n';
+                        }
+                    }
+
+                    var parsedHtml = parseExamInteractivity(fullRawText);
+                    docViewer.innerHTML = parsedHtml;
+                    if (isExam) autoConvertTextToExam(parsedHtml);
+                }
+                else if (['png', 'jpg', 'jpeg'].indexOf(ext) !== -1) {
+                    var reader = new FileReader();
+                    reader.onload = async function(event) {
+                        readStatus.innerText = "Reconociendo texto en imagen...";
+                        try {
+                            var result = await Tesseract.recognize(file, 'spa');
+                            var parsedHtml = parseExamInteractivity(result.data.text);
+                            docViewer.innerHTML = '<img src="' + event.target.result + '"><hr>' + parsedHtml;
+                            if (isExam) autoConvertTextToExam(parsedHtml);
+                            readStatus.innerText = "Imagen procesada.";
+                        } catch (ocrErr) {
+                            readStatus.innerText = "Error OCR: " + ocrErr.message;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                    return; 
+                }
+                
+                readStatus.innerText = "Documento listo para lectura y respuesta.";
+            } catch (err) {
+                readStatus.innerText = "Error al cargar archivo: " + err.message;
+            }
+        }
+
+        function parseExamInteractivity(text) {
+            if (!text) return '';
+
+            var limpio = text
+                .replace(/file:\/\/\/[^\n]+/gi, '')
+                .replace(/\d{1,2}\/\d{1,2}\/\d{2,4},\s*\d{1,2}:\d{2}/gi, '')
+                .replace(/^\d+\/\d+\s*$/gm, '')
+                .replace(/Guía de [^\n]+ Adaptada/gi, '')
+                .replace(/(\w+)-\s*\n\s*(\w+)/g, '$1$2');
+
+            limpio = formatScientificNotation(limpio);
+            var rawLines = limpio.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+
+            var mergedLines = [];
+            var connectors = ['de', 'con', 'en', 'para', 'el', 'la', 'los', 'las', 'un', 'una', 'al', 'del', 'y', 'o', 'a'];
+
+            for (var i = 0; i < rawLines.length; i++) {
+                var current = rawLines[i];
+
+                var isTag = (current.charAt(0) === '[') || (current.indexOf('Texto') === 0);
+                if (isTag) {
+                    mergedLines.push(current);
+                    continue;
+                }
+
+                while (i + 1 < rawLines.length) {
+                    var next = rawLines[i + 1];
+                    var nextIsSpecial = (next.charAt(0) === '[') ||
+                                        /^\d+[\.\)]/.test(next) ||
+                                        /^[a-eA-E][\)\.]/.test(next) ||
+                                        /^[•\-]/.test(next) ||
+                                        /^Texto/i.test(next) ||
+                                        /^[IVXLCDM]+[\.\)]/i.test(next);
+
+                    if (nextIsSpecial) {
+                        break;
+                    }
+
+                    var endsPunctuation = /[?!.:]$/.test(current);
+                    var words = current.toLowerCase().split(/\s+/);
+                    var lastWord = words.length > 0 ? words[words.length - 1] : '';
+                    var endsWithConnector = (connectors.indexOf(lastWord) !== -1);
+
+                    var shouldMerge = false;
+                    if (!endsPunctuation) {
+                        shouldMerge = true;
+                    } else if (endsWithConnector) {
+                        shouldMerge = true;
+                    }
+
+                    if (shouldMerge) {
+                        current = current + ' ' + next;
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
+                mergedLines.push(current);
+            }
+
+            var htmlResult = '';
+            var inHeader = false;
+
+            for (var j = 0; j < mergedLines.length; j++) {
+                var line = mergedLines[j];
+
+                if (line.indexOf('[ENCABEZADO]') !== -1) {
+                    inHeader = true;
+                    htmlResult += '<div style="background: rgba(5, 150, 105, 0.04); border: 2px solid #059669; padding: 14px; border-radius: 8px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">';
+                    continue;
+                }
+                if (line.indexOf('[FIN_ENCABEZADO]') !== -1) {
+                    inHeader = false;
+                    htmlResult += '</div>';
+                    continue;
+                }
+
+                if (/^\[Página \d+\]$/i.test(line)) {
+                    htmlResult += '<p style="color: #059669; font-weight: bold; margin-top: 15px; border-bottom: 2px solid #059669; font-size: 1em;">' + line + '</p>';
+                    continue;
+                }
+
+                if (/^(Texto:|Texto\s+\d+:)/i.test(line)) {
+                    htmlResult += '<h3 style="color: #047857; border-left: 4px solid #059669; padding-left: 8px; margin-top: 18px;">' + line + '</h3>';
+                    continue;
+                }
+
+                if (/^(\d+[\.\)]\s*)?\[V\/F\]/i.test(line)) {
+                    var cleaned = line.replace(/\[V\/F\]/i, '').trim();
+                    var groupName = 'vf_' + j;
+                    htmlResult += '<div style="margin: 8px 0; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-ui);">' +
+                        '<span>' + cleaned + '</span>' +
+                        '<div class="vf-container">' +
+                            '<label><input type="radio" name="' + groupName + '" value="V" class="exam-checkbox-interactive"> <b>Verdadero</b></label>' +
+                            '<label><input type="radio" name="' + groupName + '" value="F" class="exam-checkbox-interactive"> <b>Falso</b></label>' +
+                        '</div>' +
+                    '</div>';
+                    continue;
+                }
+
+                if (/^[a-eA-E][\)\.]\s*/.test(line)) {
+                    var letterMatch = line.match(/^[a-eA-E][\)\.]/)[0];
+                    var optionText = line.replace(/^[a-eA-E][\)\.]\s*/, '');
+                    htmlResult += '<div class="option-row">' +
+                        '<input type="checkbox" class="exam-checkbox-interactive">' +
+                        '<span><b>' + letterMatch + '</b> ' + optionText + '</span>' +
+                    '</div>';
+                    continue;
+                }
+
+                if (line.indexOf('[RESPUESTA_CORTA]') !== -1) {
+                    htmlResult += '<div style="margin: 6px 0 12px 0;">' +
+                        '<input type="text" class="exam-input-interactive" placeholder="Escribe o dicta tu respuesta..." style="width: 70%;">' +
+                    '</div>';
+                    continue;
+                }
+
+                if (line.indexOf('[DESARROLLO_EXTENSO]') !== -1) {
+                    htmlResult += '<div style="margin: 6px 0 12px 0;">' +
+                        '<textarea class="exam-textarea-interactive" placeholder="Desarrolla o dicta tu respuesta completa aquí..."></textarea>' +
+                    '</div>';
+                    continue;
+                }
+
+                if (line.indexOf('[RECUADRO_IMAGEN:') !== -1) {
+                    var desc = line.replace(/\[RECUADRO_IMAGEN:\s*/i, '').replace(/\]/, '');
+                    htmlResult += '<div style="border: 2px dashed #0284c7; background: rgba(2, 132, 199, 0.05); padding: 15px; border-radius: 8px; text-align: center; margin: 12px 0;">' +
+                        '<p style="margin: 0; color: #0284c7; font-weight: bold;">🖼️ ESQUEMA / DIAGRAMA</p>' +
+                        '<p style="margin: 5px 0 0 0; font-size: 0.9em; color: inherit;">' + desc + '</p>' +
+                    '</div>';
+                    continue;
+                }
+
+                var isQuestion = false;
+                if (!inHeader) {
+                    if (/^\d+[\.\)]\s+/.test(line)) isQuestion = true;
+                    if (/^[•\-]\s*Inciso/i.test(line)) isQuestion = true;
+                }
+
+                if (isQuestion) {
+                    htmlResult += '<p style="font-weight: bold; margin-top: 14px; margin-bottom: 6px; padding: 6px 10px; border-radius: 6px; border-left: 4px solid #059669; background: rgba(5, 150, 105, 0.05);">' + line + '</p>';
+                    continue;
+                }
+
+                var processedLine = line
+                    .replace(/\[_{2,}\]/g, '<input type="text" class="exam-input-interactive" placeholder="Completar...">')
+                    .replace(/\[\s*\]/g, '<input type="text" class="exam-input-interactive" placeholder="Completar...">')
+                    .replace(/_{2,}/g, '<input type="text" class="exam-input-interactive" placeholder="Completar...">');
+
+                if (inHeader) {
+                    var isFieldPrompt = /(NOMBRE|RUT|CURSO|FECHA|ESTUDIANTE|IDENTIFICACIÓN):/i.test(processedLine);
+                    if (isFieldPrompt && processedLine.indexOf('<input') === -1) {
+                        processedLine = processedLine.replace(/(NOMBRE[\w\s]*:|RUT[\w\s\/]*:|CURSO:|FECHA:)/gi, '$1 <input type="text" class="exam-input-interactive" placeholder="Completar...">');
+                    }
+                    htmlResult += '<p style="margin: 4px 0; font-size: 0.95em;">' + processedLine + '</p>';
+                } else {
+                    htmlResult += '<p style="margin: 6px 0; line-height: 1.5;">' + processedLine + '</p>';
+                }
+            }
+
+            return htmlResult;
+        }
+
+        function syncHeaderWithStudentData() {
+            var sName = document.getElementById('studentName') ? document.getElementById('studentName').value.trim() : '';
+            var sRut = document.getElementById('studentRut') ? document.getElementById('studentRut').value.trim() : '';
+            var sSub = document.getElementById('studentSubject') ? document.getElementById('studentSubject').value.trim() : '';
+            var sDate = document.getElementById('studentDate') ? document.getElementById('studentDate').value.trim() : '';
+
+            var container = document.getElementById('questionsContainer');
+            if (!container) return;
+
+            var inputs = container.querySelectorAll('input.exam-input-interactive');
+            for (var i = 0; i < inputs.length; i++) {
+                var inp = inputs[i];
+                var prevText = '';
+                var node = inp.previousSibling;
+                while (node) {
+                    if (node.nodeType === 3 && node.nodeValue && node.nodeValue.trim()) {
+                        prevText = node.nodeValue;
+                        break;
+                    } else if (node.nodeType === 1) {
+                        prevText = node.textContent;
+                        break;
+                    }
+                    node = node.previousSibling;
+                }
+
+                if (/NOMBRE|ESTUDIANTE/i.test(prevText)) {
+                    if (sName && !inp.value) inp.value = sName;
+                    inp.addEventListener('input', function() {
+                        var m = document.getElementById('studentName');
+                        if (m) m.value = this.value;
+                    });
+                } else if (/RUT|IDENTIFICACI/i.test(prevText)) {
+                    if (sRut && !inp.value) inp.value = sRut;
+                    inp.addEventListener('input', function() {
+                        var m = document.getElementById('studentRut');
+                        if (m) m.value = this.value;
+                    });
+                } else if (/CURSO|ASIGNATURA/i.test(prevText)) {
+                    if (sSub && !inp.value) inp.value = sSub;
+                    inp.addEventListener('input', function() {
+                        var m = document.getElementById('studentSubject');
+                        if (m) m.value = this.value;
+                    });
+                } else if (/FECHA/i.test(prevText)) {
+                    if (sDate && !inp.value) inp.value = sDate;
+                    inp.addEventListener('input', function() {
+                        var m = document.getElementById('studentDate');
+                        if (m) m.value = this.value;
+                    });
+                }
+            }
+        }
+
+        function autoConvertTextToExam(htmlContent) {
+            if (!htmlContent) return;
+            var container = document.getElementById('questionsContainer');
+            container.innerHTML = ''; 
+            questionCount = 0;
+            addQuestion(htmlContent, '', true);
+            syncHeaderWithStudentData();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) processFile(e.target.files[0], false);
+        });
+        document.getElementById('examFileInput').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) processFile(e.target.files[0], true);
+        });
+
+        var synth = window.speechSynthesis;
+        var voiceSelect = document.getElementById('voiceSelect');
+        var rateInput = document.getElementById('rate');
+        var voices = [];
+        var currentHighlight = null;
+
+        function getVoiceScore(voice) {
+            var name = (voice.name || '').toLowerCase();
+            var lang = (voice.lang || '').toLowerCase();
+            var score = 0;
+            if (lang === 'es-cl') score += 100;
+            else if (lang === 'es-419') score += 80;
+            else if (lang.indexOf('es-mx') === 0 || lang.indexOf('es-us') === 0) score += 60;
+            else if (lang.indexOf('es') === 0) score += 40;
+            else return -1;
+
+            if (name.indexOf('natural') !== -1 || name.indexOf('neural') !== -1 || name.indexOf('online') !== -1) score += 20;
+            if (name.indexOf('chile') !== -1) score += 30;
+            return score;
+        }
+
+        function populateVoices() {
+            if (!synth) return;
+            voices = synth.getVoices()
+                .filter(function(v) { return (v.lang || '').toLowerCase().indexOf('es') === 0; })
+                .sort(function(a, b) { return getVoiceScore(b) - getVoiceScore(a); });
+
+            voiceSelect.innerHTML = '';
+            if (voices.length === 0) {
+                var opt = document.createElement('option');
+                opt.textContent = "Voz en español estándar";
+                voiceSelect.appendChild(opt);
+                return;
+            }
+
+            voices.forEach(function(voice, index) {
+                var opt = document.createElement('option');
+                var tag = voice.lang === 'es-CL' ? ' (Chile)' : (voice.lang === 'es-419' ? ' (Neutro)' : ' (' + voice.lang + ')');
+                opt.textContent = voice.name + tag;
+                opt.setAttribute('data-name', voice.name);
+                if (index === 0) opt.selected = true;
+                voiceSelect.appendChild(opt);
+            });
+        }
+
+        populateVoices();
+        if (speechSynthesis && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        document.getElementById('rate').addEventListener('input', function(e) {
+            document.getElementById('rateVal').innerText = parseFloat(e.target.value).toFixed(1) + 'x';
+        });
+
+        function prepareTextForSpeech(text) {
+            if (!text) return text;
+            return text
+                .replace(/f\(x\)/gi, 'f de x')
+                .replace(/(\d+)\s*:\s*(\d+)/g, '$1 es a $2')
+                .replace(/(\d+)\/(\d+)/g, '$1 partido por $2')
+                .replace(/->/g, 'se relaciona con')
+                .replace(/→/g, 'se relaciona con')
+                .replace(/~/g, ' aproximadamente ')
+                .replace(/\$/g, ' pesos ');
+        }
+
+        function prepareSpansForHighlighting() {
+            var charOffset = 0;
+            function processNode(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    var text = node.nodeValue;
+                    if (!text) return;
+                    var parent = node.parentNode;
+                    var frag = document.createDocumentFragment();
+                    var regex = /(\s+|[^\s]+)/g;
+                    var match;
+                    while ((match = regex.exec(text)) !== null) {
+                        var word = match[0];
+                        var start = charOffset;
+                        var end = charOffset + word.length;
+                        charOffset += word.length;
+                        if (/\S/.test(word)) {
+                            var span = document.createElement('span');
+                            span.className = 'read-word';
+                            span.dataset.start = start;
+                            span.dataset.end = end;
+                            span.textContent = word;
+                            frag.appendChild(span);
+                        } else {
+                            frag.appendChild(document.createTextNode(word));
+                        }
+                    }
+                    parent.replaceChild(frag, node);
+                } else if (node.nodeType === Node.ELEMENT_NODE && ['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA'].indexOf(node.tagName) === -1) {
+                    Array.from(node.childNodes).forEach(processNode);
+                }
+            }
+            var existingSpans = docViewer.querySelectorAll('span.read-word');
+            existingSpans.forEach(function(s) {
+                var parent = s.parentNode;
+                parent.replaceChild(document.createTextNode(s.textContent), s);
+            });
+            docViewer.normalize();
+            Array.from(docViewer.childNodes).forEach(processNode);
+        }
+
+        function prepareAndRead() {
+            if (!synth) return;
+            if (synth.speaking) synth.cancel();
+
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+
+            var mode = document.getElementById('readMode').value;
+            var textToRead = "";
+            var startOffset = 0;
+
+            if (mode === 'selection') {
+                var selection = window.getSelection();
+                textToRead = selection.toString();
+                if (!textToRead.trim()) return alert("Selecciona primero un fragmento de texto.");
+            } else {
+                prepareSpansForHighlighting();
+                textToRead = docViewer.innerText;
+                if (mode === 'from-cursor') {
+                    var sel = window.getSelection();
+                    if (sel.rangeCount > 0) {
+                        var range = sel.getRangeAt(0);
+                        var node = range.startContainer;
+                        while (node && node !== docViewer && (!node.dataset || !node.dataset.start)) { 
+                            node = node.parentNode; 
+                        }
+                        if (node && node.dataset && node.dataset.start) {
+                            startOffset = parseInt(node.dataset.start, 10);
+                            textToRead = textToRead.substring(startOffset);
+                        }
+                    }
+                }
+            }
+            if (!textToRead.trim()) return alert("No hay texto para leer.");
+
+            var speechText = prepareTextForSpeech(textToRead);
+            var utterance = new SpeechSynthesisUtterance(speechText);
+            var selectedVoiceName = voiceSelect.selectedOptions[0] ? voiceSelect.selectedOptions[0].getAttribute('data-name') : null;
+            if (selectedVoiceName) {
+                utterance.voice = voices.find(function(v) { return v.name === selectedVoiceName; });
+            }
+            utterance.rate = parseFloat(rateInput.value);
+
+            var btnRead = document.getElementById('btnReadAction');
+            if (btnRead) {
+                btnRead.classList.add('btn-read-active');
+                btnRead.innerText = '🔊 Leyendo...';
+            }
+
+            utterance.onboundary = function(event) {
+                if (event.name === 'word' && mode !== 'selection') {
+                    var currentIdx = startOffset + event.charIndex;
+                    var spans = docViewer.querySelectorAll('span.read-word');
+                    spans.forEach(function(span) {
+                        var sStart = parseInt(span.dataset.start, 10);
+                        var sEnd = parseInt(span.dataset.end, 10);
+                        if (currentIdx >= sStart && currentIdx < sEnd) {
+                            if (currentHighlight) currentHighlight.classList.remove('highlight-active');
+                            span.classList.add('highlight-active');
+                            currentHighlight = span;
+                            span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    });
+                }
+            };
+
+            var resetReadUI = function() {
+                if (currentHighlight) currentHighlight.classList.remove('highlight-active');
+                if (btnRead) {
+                    btnRead.classList.remove('btn-read-active');
+                    btnRead.innerText = '▶️ Leer con Marcador';
+                }
+            };
+
+            utterance.onend = resetReadUI;
+            utterance.onerror = resetReadUI;
+
+            synth.speak(utterance);
+        }
+
+        function stopReading() {
+            if (synth && synth.speaking) synth.cancel();
+            if (currentHighlight) currentHighlight.classList.remove('highlight-active');
+            var btnRead = document.getElementById('btnReadAction');
+            if (btnRead) {
+                btnRead.classList.remove('btn-read-active');
+                btnRead.innerText = '▶️ Leer con Marcador';
+            }
+        }
+
+        function copySelectionToExam() {
+            var selection = window.getSelection();
+            var selectedText = selection.toString().trim();
+            if (!selectedText) return alert("Selecciona texto primero.");
+            if (!examModeActive) requestExamMode();
+            
+            if (activeExamInput && (activeExamInput.tagName === 'INPUT' || activeExamInput.tagName === 'TEXTAREA' || activeExamInput.isContentEditable)) {
+                if (activeExamInput.isContentEditable) {
+                    activeExamInput.focus();
+                    document.execCommand('insertText', false, selectedText);
+                } else {
+                    activeExamInput.value = selectedText;
+                }
+                saveExamToStorage();
+                return;
+            }
+            addQuestion(selectedText, '');
+        }
+
+        var mathDictationMode = true;
+        function toggleMathDictationMode() {
+            mathDictationMode = !mathDictationMode;
+            var btnStandard = document.getElementById('btnMathModeDict');
+            var btnExam = document.getElementById('btnMathModeDictExam');
+            var text = mathDictationMode ? '📐 Math: ON' : '📐 Math: OFF';
+            var bg = mathDictationMode ? '#6d28d9' : '#4b5563';
+            if (btnStandard) { btnStandard.innerText = text; btnStandard.style.backgroundColor = bg; }
+            if (btnExam) { btnExam.innerText = text; btnExam.style.backgroundColor = bg; }
+        }
+
+        function convertSpokenMath(text) {
+            if (!mathDictationMode || !text) return text;
+            var t = text;
+            t = t.replace(/\bun medio\b/gi, '½')
+                 .replace(/\bun tercio\b/gi, '⅓')
+                 .replace(/\bdos tercios\b/gi, '⅔')
+                 .replace(/\bun cuarto\b/gi, '¼')
+                 .replace(/\btres cuartos\b/gi, '¾')
+                 .replace(/(\d+|\w+)\s+(es a)\s+(\d+|\w+)/gi, '$1 : $3')
+                 .replace(/(\d+|\w+)\s+(sobre|partido por)\s+(\d+|\w+)/gi, '$1/$3')
+                 .replace(/\bmás\b/gi, '+')
+                 .replace(/\bmenos\b/gi, '-')
+                 .replace(/\bpor\b/gi, '×')
+                 .replace(/\bdividido por\b/gi, '÷')
+                 .replace(/\bes igual a\b/gi, '=')
+                 .replace(/\bigual a\b/gi, '=')
+                 .replace(/\braíz cuadrada de\b/gi, '√')
+                 .replace(/\bal cuadrado\b/gi, '²')
+                 .replace(/\bal cubo\b/gi, '³')
+                 .replace(/\bf de equis\b/gi, 'f(x)')
+                 .replace(/\bf de x\b/gi, 'f(x)')
+                 .replace(/\bpi\b/gi, 'π');
+            return t;
+        }
+
+        var recognition = null;
+        var isDictating = false;
+        var dictationBuffer = '';
+        var dictationText = document.getElementById('dictationText');
+        var dictStatus = document.getElementById('dictStatus');
+        var speechLocales = ['es-CL', 'es-419', 'es-ES', 'es'];
+        var currentLocaleIndex = 0;
+
+        function setDictationButtonsState(active) {
+            var startButtons = [document.getElementById('btnStartDict'), document.getElementById('btnStartDictExam')];
+            var stopButtons = [document.getElementById('btnStopDict'), document.getElementById('btnStopDictExam')];
+            
+            startButtons.forEach(function(btn) { 
+                if (!btn) return;
+                btn.disabled = active; 
+                if (active) {
+                    btn.classList.add('btn-voice-active');
+                    btn.dataset.origText = btn.dataset.origText || btn.innerText;
+                    btn.innerText = '🔴 Escuchando...';
+                } else {
+                    btn.classList.remove('btn-voice-active');
+                    if (btn.dataset.origText) btn.innerText = btn.dataset.origText;
+                }
+            });
+
+            stopButtons.forEach(function(btn) { 
+                if (btn) btn.disabled = !active; 
+            });
+        }
+
+        function initSpeechRecognition() {
+            var SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechClass) return null;
+            var rec = new SpeechClass();
+            rec.continuous = true;
+            rec.interimResults = true;
+            rec.lang = speechLocales[currentLocaleIndex];
+
+            rec.onstart = function() {
+                dictStatus.innerText = '🔴 Escuchando (' + rec.lang + ')... ' + (mathDictationMode ? '[Math ON]' : '');
+                setDictationButtonsState(true);
+            };
+
+            rec.onresult = function(e) {
+                var interim = '';
+                var finalBlock = '';
+                for (var i = e.resultIndex; i < e.results.length; i++) {
+                    var trans = e.results[i][0].transcript;
+                    trans = convertSpokenMath(trans);
+                    if (e.results[i].isFinal) { finalBlock += trans + ' '; }
+                    else { interim += trans; }
+                }
+
+                if (activeExamInput) {
+                    if (activeExamInput.isContentEditable) {
+                        if (finalBlock) {
+                            activeExamInput.focus();
+                            document.execCommand('insertText', false, finalBlock);
+                        }
+                    } else {
+                        if (finalBlock) dictationBuffer += finalBlock;
+                        activeExamInput.value = dictationBuffer + interim;
+                    }
+                    saveExamToStorage();
+                } else {
+                    if (finalBlock) dictationBuffer += finalBlock;
+                    dictationText.value = dictationBuffer + interim;
+                }
+            };
+
+            rec.onerror = function(e) {
+                if (e.error === 'no-speech') return;
+                if (e.error === 'language-not-supported' && currentLocaleIndex < speechLocales.length - 1) {
+                    currentLocaleIndex++;
+                    rec.lang = speechLocales[currentLocaleIndex];
+                    if (isDictating) try { rec.start(); } catch(err){}
+                    return;
+                }
+                dictStatus.innerText = 'Aviso micrófono: ' + e.error;
+                stopDictationWeb();
+            };
+
+            rec.onend = function() {
+                if (isDictating) {
+                    try { rec.start(); } catch(err){}
+                } else {
+                    dictStatus.innerText = "Dictado detenido.";
+                    setDictationButtonsState(false);
+                }
+            };
+
+            return rec;
+        }
+
+        function startDictationWeb() {
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                return alert("Navegador sin soporte de voz. Use Google Chrome o Edge bajo conexión segura HTTPS.");
+            }
+            if (!recognition) recognition = initSpeechRecognition();
+
+            var target = activeExamInput ? activeExamInput : dictationText;
+            if (target && !target.isContentEditable) {
+                dictationBuffer = target.value ? target.value.trim() + ' ' : '';
+            } else {
+                dictationBuffer = '';
+            }
+
+            isDictating = true;
+            try { recognition.start(); } catch(e) {}
+        }
+
+        function stopDictationWeb() {
+            isDictating = false;
+            setDictationButtonsState(false);
+            if (recognition) { try { recognition.stop(); } catch(e){} }
+        }
+
+        function exportWord() {
+            var text = dictationText.value;
+            if (!text.trim()) return alert("Vacío.");
+            var blob = new Blob(['\ufeff', text], { type: 'application/msword' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'dictado.doc';
+            a.click();
+        }
+
+        function exportPDF() {
+            var el = document.createElement('div');
+            el.innerHTML = '<p style="padding:20px; font-size:16px; white-space:pre-wrap;">' + dictationText.value + '</p>';
+            html2pdf().from(el).save('dictado.pdf');
+        }
+
+        var examModeActive = false;
+        var questionCount = 0;
+        var timerInterval = null;
+        var timerSeconds = 0;
+
+        function requestExamMode() {
+            if (examModeActive) { exitExamMode(); }
+            else { document.getElementById('preEntryModal').style.display = 'flex'; }
+        }
+
+        function cancelExamEntry() { document.getElementById('preEntryModal').style.display = 'none'; }
+
+        function confirmExamEntry() {
+            document.getElementById('preEntryModal').style.display = 'none';
+            examModeActive = true;
+            
+            document.getElementById('appContainer').classList.add('exam-fullscreen');
+            document.getElementById('readerCard').style.display = 'none';
+            document.getElementById('standardDictationCard').style.display = 'none';
+            document.getElementById('examPanel').style.display = 'flex';
+            
+            var btnToggle = document.getElementById('btnExamToggle');
+            btnToggle.innerText = '📝 Salir';
+            btnToggle.className = 'btn-danger';
+            btnToggle.style.backgroundColor = '';
+            btnToggle.style.color = '';
+
+            if (document.querySelectorAll('.question-block').length === 0) { addQuestion(); }
+            loadExamFromStorage();
+            syncHeaderWithStudentData();
+        }
+
+        function exitExamMode() {
+            examModeActive = false;
+            document.getElementById('appContainer').classList.remove('exam-fullscreen');
+            document.getElementById('readerCard').style.display = 'flex';
+            document.getElementById('standardDictationCard').style.display = 'flex';
+            document.getElementById('examPanel').style.display = 'none';
+            
+            var btnToggle = document.getElementById('btnExamToggle');
+            btnToggle.innerText = '📝 Modo Evaluación';
+            btnToggle.className = 'btn-gold';
+            btnToggle.style.backgroundColor = '';
+            btnToggle.style.color = '';
+        }
+
+        function updateExamMargins(val) {
+            var doc = document.querySelector('.exam-rich-text');
+            if (doc) doc.style.padding = val + 'px';
+        }
+
+        function addQuestion(text, answer, isRichText) {
+            if (text === undefined) text = '';
+            if (answer === undefined) answer = '';
+            if (isRichText === undefined) isRichText = false;
+
+            questionCount++;
+            var qId = questionCount;
+            var container = document.getElementById('questionsContainer');
+            var qDiv = document.createElement('div');
+            qDiv.className = 'question-block';
+            qDiv.id = 'qBlock_' + qId;
+            qDiv.style.cssText = 'border: 1px solid var(--border-ui); padding: 8px; border-radius: 8px; background: var(--surface); display: flex; flex-direction: column; flex: 1; height: 100%; min-height: 0;';
+            
+            var titleElement = isRichText 
+                ? '<div id="qTitle_' + qId + '" class="doc-viewer exam-rich-text" contenteditable="true" style="flex: 1; width: 100%; margin-bottom: 4px; padding: 15px; border: 2px dashed #059669; border-radius: 6px; font-size: 1em; line-height: 1.6; height: 100%;">' + text + '</div>'
+                : '<input type="text" id="qTitle_' + qId + '" placeholder="Enunciado de la pregunta..." value="' + text + '" style="width: 100%; margin-bottom: 4px;">';
+
+            qDiv.innerHTML = 
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+                    '<b style="color: #059669; font-size: 0.85em;">' + (isRichText ? '✅ Espacio de Evaluación Accesible' : 'Pregunta ' + qId) + '</b>' +
+                    '<button type="button" onclick="removeQuestion(' + qId + ')" class="btn-danger" style="min-height: 24px; padding: 2px 6px; font-size: 0.75em;">🗑️ Eliminar</button>' +
+                '</div>' +
+                titleElement +
+                '<textarea id="qAns_' + qId + '" placeholder="' + (isRichText ? 'Notas o cálculo global (opcional)...' : 'Escribe o dicta tu respuesta...') + '" style="height: 60px; min-height: 50px; flex: none;"></textarea>' +
+                '<div style="display: flex; gap: 6px; margin-top: 4px;">' +
+                    '<button type="button" onclick="dictateForQuestion(\'qAns_' + qId + '\')" style="min-height: 28px; font-size: 0.8em; background: #0284c7; color: #ffffff;">🎤 Dictar en las Notas</button>' +
+                '</div>';
+
+            container.appendChild(qDiv);
+            if (answer) { document.getElementById('qAns_' + qId).value = answer; }
+            saveExamToStorage();
+        }
+
+        function removeQuestion(id) {
+            var qDiv = document.getElementById('qBlock_' + id);
+            if (qDiv) qDiv.remove();
+            saveExamToStorage();
+        }
+
+        function dictateForQuestion(fieldId) {
+            var field = document.getElementById(fieldId);
+            if (field) {
+                setActiveExamInput(field);
+                field.focus();
+                startDictationWeb();
+            }
+        }
+
+        function insertMathSymbol(symbol) {
+            var target = activeExamInput ? activeExamInput : document.getElementById('dictationText');
+            if (!target) return alert("Seleccione primero un campo de respuesta.");
+            if (target.isContentEditable) {
+                target.focus();
+                document.execCommand('insertText', false, symbol);
+            } else {
+                var start = target.selectionStart || 0;
+                var end = target.selectionEnd || 0;
+                var val = target.value;
+                target.value = val.substring(0, start) + symbol + val.substring(end);
+                target.selectionStart = target.selectionEnd = start + symbol.length;
+                target.focus();
+            }
+            saveExamToStorage();
+        }
+
+        function toggleTimer() {
+            var btn = document.getElementById('btnTimerToggle');
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.innerText = '▶️ Iniciar';
+            } else {
+                timerInterval = setInterval(function() {
+                    timerSeconds++;
+                    var mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                    var secs = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = mins + ':' + secs;
+                    saveExamToStorage();
+                }, 1000);
+                btn.innerText = '⏸️ Pausa';
+            }
+        }
+
+        function saveExamToStorage() {
+            if (!examModeActive && document.getElementById('preEntryModal').style.display === 'none') return;
+            var sName = document.getElementById('studentName');
+            var sRut = document.getElementById('studentRut');
+            var sSub = document.getElementById('studentSubject');
+            var sDate = document.getElementById('studentDate');
+
+            var data = {
+                studentName: sName ? sName.value : '',
+                studentRut: sRut ? sRut.value : '',
+                studentSubject: sSub ? sSub.value : '',
+                studentDate: sDate ? sDate.value : '',
+                timerSeconds: timerSeconds,
+                questions: []
+            };
+            var blocks = document.querySelectorAll('.question-block');
+            blocks.forEach(function(b) {
+                var id = b.id.replace('qBlock_', '');
+                var titleEl = document.getElementById('qTitle_' + id);
+                var ansEl = document.getElementById('qAns_' + id);
+                data.questions.push({
+                    id: id,
+                    title: titleEl ? (titleEl.tagName === 'DIV' ? titleEl.innerHTML : titleEl.value) : '',
+                    answer: ansEl ? ansEl.value : '',
+                    isRichText: titleEl ? (titleEl.tagName === 'DIV') : false
+                });
+            });
+            localStorage.setItem('evaluacion_backup', JSON.stringify(data));
+        }
+
+        function loadExamFromStorage() {
+            var saved = localStorage.getItem('evaluacion_backup');
+            if (!saved) return;
+            try {
+                var data = JSON.parse(saved);
+                var sName = document.getElementById('studentName');
+                var sRut = document.getElementById('studentRut');
+                var sSub = document.getElementById('studentSubject');
+                var sDate = document.getElementById('studentDate');
+
+                if (sName) sName.value = data.studentName || '';
+                if (sRut) sRut.value = data.studentRut || '';
+                if (sSub) sSub.value = data.studentSubject || '';
+                if (sDate) sDate.value = data.studentDate || '';
+                
+                if (data.timerSeconds) {
+                    timerSeconds = data.timerSeconds;
+                    var mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                    var secs = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = mins + ':' + secs;
+                }
+
+                if (data.questions && data.questions.length > 0) {
+                    document.getElementById('questionsContainer').innerHTML = '';
+                    questionCount = 0;
+                    data.questions.forEach(function(q) { addQuestion(q.title, q.answer, q.isRichText); });
+                }
+            } catch(e){}
+        }
+
+        function exportExamWord() {
+            var sName = document.getElementById('studentName');
+            var sRut = document.getElementById('studentRut');
+            var sSub = document.getElementById('studentSubject');
+            var sDate = document.getElementById('studentDate');
+
+            var name = sName && sName.value ? sName.value : 'Sin_Nombre';
+            var rut = sRut && sRut.value ? sRut.value : 'Sin_RUT';
+            var subject = sSub && sSub.value ? sSub.value : 'Evaluación';
+            var date = sDate && sDate.value ? sDate.value : new Date().toLocaleDateString();
+
+            var content = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+            '<head><meta charset="utf-8"><title>Examen</title></head><body>' +
+            '<h2>LICEO SAN FELIPE BENICIO - ENTREGA DE EVALUACIÓN ACCESIBLE</h2>' +
+            '<p><b>Estudiante:</b> ' + name + '<br><b>RUT:</b> ' + rut + '<br><b>Asignatura:</b> ' + subject + '<br><b>Fecha:</b> ' + date + '</p><hr>';
+
+            var blocks = document.querySelectorAll('.question-block');
+            blocks.forEach(function(b, index) {
+                var id = b.id.replace('qBlock_', '');
+                var titleEl = document.getElementById('qTitle_' + id);
+                var isRich = titleEl && titleEl.tagName === 'DIV';
+                
+                var titleHTML = '';
+                if (isRich) {
+                    var tempDiv = titleEl.cloneNode(true);
+                    var origInputs = titleEl.querySelectorAll('input[type="text"]');
+                    var cloneInputs = tempDiv.querySelectorAll('input[type="text"]');
+                    for (var i = 0; i < origInputs.length; i++) {
+                        var val = origInputs[i].value ? origInputs[i].value.trim() : '';
+                        var span = document.createElement('span');
+                        span.style.textDecoration = 'underline';
+                        span.style.fontWeight = 'bold';
+                        span.innerText = ' [ ' + (val ? val : 'Sin responder') + ' ] ';
+                        if (cloneInputs[i] && cloneInputs[i].parentNode) {
+                            cloneInputs[i].parentNode.replaceChild(span, cloneInputs[i]);
+                        }
+                    }
+
+                    var origChecks = titleEl.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+                    var cloneChecks = tempDiv.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+                    for (var c = 0; c < origChecks.length; c++) {
+                        var spanCheck = document.createElement('span');
+                        spanCheck.style.fontWeight = 'bold';
+                        spanCheck.innerText = origChecks[c].checked ? ' [ X ] ' : ' [   ] ';
+                        if (cloneChecks[c] && cloneChecks[c].parentNode) {
+                            cloneChecks[c].parentNode.replaceChild(spanCheck, cloneChecks[c]);
+                        }
+                    }
+
+                    var origTextareas = titleEl.querySelectorAll('textarea');
+                    var cloneTextareas = tempDiv.querySelectorAll('textarea');
+                    for (var t = 0; t < origTextareas.length; t++) {
+                        var p = document.createElement('p');
+                        p.style.border = '1px solid #059669';
+                        p.style.padding = '8px';
+                        var tVal = origTextareas[t].value ? origTextareas[t].value.trim() : '';
+                        p.innerText = tVal ? tVal : '(Sin desarrollo)';
+                        if (cloneTextareas[t] && cloneTextareas[t].parentNode) {
+                            cloneTextareas[t].parentNode.replaceChild(p, cloneTextareas[t]);
+                        }
+                    }
+                    titleHTML = tempDiv.innerHTML;
+                } else {
+                    titleHTML = titleEl ? (titleEl.value || 'Pregunta ' + (index + 1)) : 'Pregunta ' + (index + 1);
+                }
+
+                var ansEl = document.getElementById('qAns_' + id);
+                var ans = ansEl && ansEl.value ? ansEl.value.trim() : '';
+
+                content += '<div style="padding: 10px; margin-bottom: 10px;">' + titleHTML + '</div>';
+                if (ans) {
+                    content += '<p><b>Notas Adicionales:</b> ' + ans + '</p>';
+                }
+                content += '<hr>';
+            });
+
+            content += '</body></html>';
+            var blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Entrega_' + name.replace(/\s+/g, '_') + '.doc';
+            a.click();
+        }
+
+        function exportExamPDF() {
+            var sName = document.getElementById('studentName');
+            var sRut = document.getElementById('studentRut');
+            var sSub = document.getElementById('studentSubject');
+            var sDate = document.getElementById('studentDate');
+
+            var name = sName && sName.value ? sName.value : 'Sin_Nombre';
+            var rut = sRut && sRut.value ? sRut.value : 'Sin_RUT';
+            var subject = sSub && sSub.value ? sSub.value : 'Evaluación';
+            var date = sDate && sDate.value ? sDate.value : new Date().toLocaleDateString();
+
+            var el = document.createElement('div');
+            el.style.padding = '25px';
+            el.style.fontFamily = 'sans-serif';
+            el.style.color = '#000000';
+
+            var html = '<div style="border-bottom: 2px solid #059669; padding-bottom: 10px; margin-bottom: 15px;">' +
+                    '<h2 style="margin: 0; color: #1a1a1b;">Liceo San Felipe Benicio</h2>' +
+                    '<h3 style="margin: 2px 0 6px 0; color: #059669;">Entrega de Evaluación Accesible</h3>' +
+                    '<p style="margin: 4px 0 0 0;"><b>Estudiante:</b> ' + name + ' | <b>RUT:</b> ' + rut + '</p>' +
+                    '<p style="margin: 2px 0 0 0;"><b>Asignatura:</b> ' + subject + ' | <b>Fecha:</b> ' + date + '</p>' +
+                '</div>';
+
+            var blocks = document.querySelectorAll('.question-block');
+            blocks.forEach(function(b, index) {
+                var id = b.id.replace('qBlock_', '');
+                var titleEl = document.getElementById('qTitle_' + id);
+                var isRich = titleEl && titleEl.tagName === 'DIV';
+                
+                var titleHTML = '';
+                if (isRich) {
+                    var tempDiv = titleEl.cloneNode(true);
+                    var origInputs = titleEl.querySelectorAll('input[type="text"]');
+                    var cloneInputs = tempDiv.querySelectorAll('input[type="text"]');
+                    for (var i = 0; i < origInputs.length; i++) {
+                        var val = origInputs[i].value ? origInputs[i].value.trim() : '';
+                        var span = document.createElement('span');
+                        span.style.borderBottom = '2px solid #059669';
+                        span.style.fontWeight = 'bold';
+                        span.innerText = ' ' + (val ? val : 'Sin responder') + ' ';
+                        if (cloneInputs[i] && cloneInputs[i].parentNode) {
+                            cloneInputs[i].parentNode.replaceChild(span, cloneInputs[i]);
+                        }
+                    }
+
+                    var origChecks = titleEl.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+                    var cloneChecks = tempDiv.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+                    for (var c = 0; c < origChecks.length; c++) {
+                        var spanCheck = document.createElement('span');
+                        spanCheck.style.fontWeight = 'bold';
+                        spanCheck.innerText = origChecks[c].checked ? ' [ X ] ' : ' [   ] ';
+                        if (cloneChecks[c] && cloneChecks[c].parentNode) {
+                            cloneChecks[c].parentNode.replaceChild(spanCheck, cloneChecks[c]);
+                        }
+                    }
+
+                    var origTextareas = titleEl.querySelectorAll('textarea');
+                    var cloneTextareas = tempDiv.querySelectorAll('textarea');
+                    for (var t = 0; t < origTextareas.length; t++) {
+                        var p = document.createElement('p');
+                        p.style.border = '1px solid #059669';
+                        p.style.padding = '8px';
+                        p.style.background = '#f8fafc';
+                        var tVal = origTextareas[t].value ? origTextareas[t].value.trim() : '';
+                        p.innerText = tVal ? tVal : '(Sin desarrollo)';
+                        if (cloneTextareas[t] && cloneTextareas[t].parentNode) {
+                            cloneTextareas[t].parentNode.replaceChild(p, cloneTextareas[t]);
+                        }
+                    }
+                    titleHTML = tempDiv.innerHTML;
+                } else {
+                    titleHTML = titleEl ? (titleEl.value || 'Pregunta ' + (index + 1)) : 'Pregunta ' + (index + 1);
+                }
+
+                html += '<div style="margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">' + titleHTML + '</div>';
+                var ansEl = document.getElementById('qAns_' + id);
+                var ans = ansEl && ansEl.value ? ansEl.value.trim() : '';
+                if (ans) {
+                    html += '<p style="background: #f1f5f9; padding: 8px; border-left: 3px solid #0284c7;"><b>Notas:</b> ' + ans + '</p>';
+                }
+            });
+
+            el.innerHTML = html;
+            html2pdf().from(el).save('Entrega_' + name.replace(/\s+/g, '_') + '.pdf');
+        }
+    </script>
+</body>
+</html>
