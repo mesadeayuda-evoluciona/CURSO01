@@ -1,0 +1,2625 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Del Subsuelo al Motor — Libro 3D Interactivo (Liceo San Felipe Benicio)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --desk-dark: #0d0e10;
+      --desk-wood: #1c1714;
+      --paper: #fbf8f1;
+      --paper-shade: #ebe1cb;
+      --leather: #1f1a15;
+      --ink: #1a1a1b;
+      --ink-muted: #57534c;
+      --accent-gold: #c49108;
+      --brand-gold: #ffd700;
+      --brand-black: #1a1a1b;
+      --ok-green: #167940;
+      --err-red: #b52a1e;
+      --font-serif: "Georgia", "Times New Roman", serif;
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background:
+        radial-gradient(circle at 50% 28%, #312923 0%, var(--desk-wood) 52%, var(--desk-dark) 100%);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* ==================== BARRA SUPERIOR LIMPIA ==================== */
+    .topbar {
+      height: 46px;
+      background: rgba(18, 18, 20, 0.96);
+      border-bottom: 2px solid var(--brand-gold);
+      color: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 100;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    .topbar-left, .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .brand-badge {
+      background: var(--brand-gold);
+      color: var(--brand-black);
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    #top-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 36vw;
+    }
+
+    .top-btn {
+      background: #2b2b2f;
+      color: #f2f2f2;
+      border: 1px solid #4a4a50;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .top-btn:hover {
+      background: #3a3a40;
+      border-color: var(--brand-gold);
+    }
+
+    .top-btn.active {
+      background: var(--brand-gold);
+      color: var(--brand-black);
+      border-color: var(--brand-gold);
+      font-weight: 800;
+    }
+
+    .voice-select {
+      background: #232327;
+      color: #e4e4e7;
+      border: 1px solid #4a4a50;
+      border-radius: 5px;
+      padding: 3px 7px;
+      font-size: 0.73rem;
+      max-width: 195px;
+      cursor: pointer;
+    }
+
+    /* ==================== MESA 3D RESPONSIVA ==================== */
+    .desk-viewport {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 46px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 2200px;
+      overflow: hidden;
+      position: relative;
+      cursor: grab;
+    }
+
+    .desk-viewport:active { cursor: grabbing; }
+
+    .desk-hint-pill {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 16, 18, 0.86);
+      color: #d4d4d8;
+      border: 1px solid rgba(255, 215, 0, 0.35);
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      pointer-events: none;
+      z-index: 40;
+      white-space: nowrap;
+    }
+
+    /* Dimensiones base del libro que se auto-escalan por JS para calzar siempre al 100% */
+    .book-rig-3d {
+      width: 1260px;
+      height: 700px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.08s ease-out;
+      transform-origin: center center;
+      flex-shrink: 0;
+    }
+
+    .book-table-shadow {
+      position: absolute;
+      inset: 14px;
+      background: rgba(0, 0, 0, 0.76);
+      filter: blur(26px);
+      transform: translateZ(-30px) translateY(16px) scale(1.02);
+      border-radius: 14px;
+      pointer-events: none;
+    }
+
+    .book-hardcover-back {
+      position: absolute;
+      inset: -10px;
+      background: linear-gradient(135deg, #241d16 0%, #15110d 100%);
+      border: 2px solid #6e572b;
+      border-radius: 10px;
+      transform: translateZ(-20px);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      pointer-events: none;
+    }
+
+    /* Cantos físicos 3D del bloque de hojas */
+    .page-block-edge {
+      position: absolute;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        #f7f2e4 0px,
+        #f7f2e4 2px,
+        #d6cbb3 2px,
+        #d6cbb3 4px
+      );
+    }
+
+    .edge-bottom {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 20px;
+      transform-origin: bottom center;
+      transform: rotateX(-90deg);
+      border-bottom: 2px solid #4a3b20;
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.28);
+    }
+
+    .edge-right {
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: 20px;
+      transform-origin: right center;
+      transform: rotateY(90deg);
+      background: repeating-linear-gradient(
+        to right,
+        #f7f2e4 0px,
+        #f7f2e4 2px,
+        #d6cbb3 2px,
+        #d6cbb3 4px
+      );
+    }
+
+    .edge-left {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 20px;
+      transform-origin: left center;
+      transform: rotateY(-90deg);
+      background: repeating-linear-gradient(
+        to left,
+        #f7f2e4 0px,
+        #f7f2e4 2px,
+        #d6cbb3 2px,
+        #d6cbb3 4px
+      );
+    }
+
+    /* Superficie del libro abierto */
+    .book-surface {
+      width: 100%;
+      height: 100%;
+      background: var(--paper);
+      border-radius: 6px;
+      display: grid;
+      grid-template-columns: 1fr 26px 1fr;
+      position: relative;
+      transform-style: preserve-3d;
+      box-shadow: 0 0 0 2px #cbbd9f;
+      cursor: default;
+      overflow: hidden;
+    }
+
+    .book-surface.cover-mode {
+      grid-template-columns: 1fr;
+      width: 850px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #171719 0%, #26231f 100%);
+      border: 3px solid var(--brand-gold);
+    }
+
+    .spine {
+      background: linear-gradient(90deg,
+        #d5c9ae 0%,
+        #a89878 26%,
+        #73654c 50%,
+        #a89878 74%,
+        #d5c9ae 100%);
+      box-shadow:
+        -14px 0 24px rgba(0,0,0,0.18),
+        14px 0 24px rgba(0,0,0,0.18),
+        inset 0 0 10px rgba(0,0,0,0.4);
+      z-index: 8;
+    }
+
+    /* Hoja 3D animada al pasar página */
+    .turning-leaf {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: calc(50% - 13px);
+      left: calc(50% + 13px);
+      transform-origin: left center;
+      background: linear-gradient(90deg, #dfd4bc 0%, #fbf8f1 20%, #f4ede0 85%, #dcd0b6 100%);
+      z-index: 45;
+      pointer-events: none;
+      opacity: 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .turning-leaf.flip-next {
+      animation: flipNext3D 0.62s cubic-bezier(0.42, 0.05, 0.22, 1) forwards;
+    }
+
+    .turning-leaf.flip-prev {
+      animation: flipPrev3D 0.62s cubic-bezier(0.42, 0.05, 0.22, 1) forwards;
+    }
+
+    @keyframes flipNext3D {
+      0%   { opacity: 1; transform: rotateY(0deg) translateZ(2px); }
+      50%  { opacity: 1; transform: rotateY(-90deg) translateZ(18px); box-shadow: -28px 0 46px rgba(0,0,0,0.45); }
+      100% { opacity: 0; transform: rotateY(-180deg) translateZ(2px); }
+    }
+
+    @keyframes flipPrev3D {
+      0%   { opacity: 1; transform: rotateY(-180deg) translateZ(2px); }
+      50%  { opacity: 1; transform: rotateY(-90deg) translateZ(18px); box-shadow: -28px 0 46px rgba(0,0,0,0.45); }
+      100% { opacity: 0; transform: rotateY(0deg) translateZ(2px); }
+    }
+
+    /* ==================== PÁGINAS CON PIE DE PÁGINA SIEMPRE VISIBLE ==================== */
+    .page {
+      padding: 15px 22px 12px 22px;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 7px;
+      position: relative;
+    }
+
+    .page-left {
+      background: linear-gradient(90deg, #f1e9d7 0%, var(--paper) 12%, var(--paper) 90%, #e2d6bc 100%);
+      user-select: text;
+    }
+
+    .page-right {
+      background: linear-gradient(90deg, #e2d6bc 0%, var(--paper) 10%, var(--paper) 88%, #f1e9d7 100%);
+    }
+
+    .page-top-content {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 0;
+    }
+
+    .kicker {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #806210;
+      font-weight: 800;
+    }
+
+    .spread-title {
+      font-family: var(--font-serif);
+      font-size: 1.32rem;
+      line-height: 1.14;
+      color: var(--ink);
+      border-bottom: 2px solid #e0d5bc;
+      padding-bottom: 4px;
+    }
+
+    .body-text {
+      font-family: var(--font-serif);
+      font-size: 0.89rem;
+      line-height: 1.44;
+      color: #23221f;
+    }
+
+    .key-box {
+      background: #f2ead5;
+      border-left: 4px solid var(--accent-gold);
+      padding: 7px 11px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.81rem;
+      line-height: 1.38;
+      color: #1e1d1a;
+    }
+
+    .key-box strong {
+      display: block;
+      margin-bottom: 2px;
+      color: #5a4308;
+    }
+
+    .chem-eq {
+      font-family: "Cambria Math", "Georgia", serif;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.78);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #d8cbb0;
+      white-space: nowrap;
+    }
+
+    .chile-pill {
+      background: #fffdf7;
+      border: 1px dashed #bfa97a;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.77rem;
+      color: #49453e;
+      line-height: 1.32;
+    }
+
+    /* Bloque de Predicción compacto */
+    .predict-box {
+      background: #f4ecdb;
+      border: 1px solid #d4c6a8;
+      border-radius: 8px;
+      padding: 8px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .section-tag {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6b5310;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .predict-q {
+      font-weight: 700;
+      font-size: 0.83rem;
+      color: var(--ink);
+      line-height: 1.26;
+    }
+
+    .predict-options {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pred-opt {
+      text-align: left;
+      background: #fff;
+      border: 1px solid #c7baa0;
+      padding: 5px 9px;
+      border-radius: 5px;
+      font-size: 0.77rem;
+      cursor: pointer;
+      transition: all 0.14s;
+      color: var(--ink);
+      line-height: 1.24;
+    }
+
+    .pred-opt:hover {
+      border-color: var(--accent-gold);
+      background: #fffdf5;
+    }
+
+    .pred-opt.selected-ok {
+      background: #e6f6ec;
+      border-color: var(--ok-green);
+      font-weight: 700;
+    }
+
+    .pred-opt.selected-err {
+      background: #fcebe9;
+      border-color: var(--err-red);
+    }
+
+    .flap {
+      display: none;
+      padding: 5px 8px;
+      background: #fff;
+      border-top: 2px dashed #cbbd9f;
+      font-size: 0.75rem;
+      line-height: 1.3;
+      color: #252422;
+      border-radius: 0 0 5px 5px;
+    }
+
+    .flap.open { display: block; }
+
+    /* Barra de pie de página blindada (nunca se esconde ni recorta) */
+    .page-footer-bar {
+      height: 36px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1.5px solid #dccfb4;
+      padding-top: 5px;
+      flex-shrink: 0;
+      z-index: 12;
+    }
+
+    .folio-num {
+      font-family: var(--font-serif);
+      font-size: 0.76rem;
+      color: #655d4d;
+      font-weight: 700;
+    }
+
+    .page-turn-btn {
+      background: #1f1c18;
+      color: var(--brand-gold);
+      border: 1.5px solid var(--brand-gold);
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.77rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .page-turn-btn:hover {
+      background: var(--brand-gold);
+      color: var(--brand-black);
+      transform: translateY(-1px);
+    }
+
+    /* ==================== PÁGINA DERECHA: VISOR 3D FLEXIBLE + CONTROLES ==================== */
+    .stage-space {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 250px;
+      max-height: 330px;
+      background: radial-gradient(circle at 50% 32%, #2c3540 0%, #181d24 100%);
+      border: 1.5px solid #b5a483;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: inset 0 3px 14px rgba(0,0,0,0.45);
+    }
+
+    #three-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #three-canvas:active { cursor: grabbing; }
+
+    .css2d-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .lbl {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: rgba(18, 18, 20, 0.88);
+      color: #f8fafc;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 215, 0, 0.6);
+      pointer-events: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+
+    .stage-hint {
+      position: absolute;
+      bottom: 5px;
+      right: 8px;
+      background: rgba(18, 18, 20, 0.78);
+      color: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.66rem;
+      pointer-events: none;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .controls-box {
+      background: #f3ecda;
+      border: 1px solid #d5c7ab;
+      border-radius: 8px;
+      padding: 7px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.77rem;
+    }
+
+    .ctrl-row label {
+      font-weight: 700;
+      min-width: 140px;
+      color: #292621;
+    }
+
+    .ctrl-row input[type="range"] {
+      flex: 1;
+      accent-color: #9e740a;
+      cursor: pointer;
+    }
+
+    .ctrl-val {
+      min-width: 60px;
+      text-align: right;
+      font-weight: 700;
+      font-family: monospace;
+      font-size: 0.76rem;
+    }
+
+    .ctrl-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .act-btn {
+      background: var(--brand-black);
+      color: #fff;
+      border: 1px solid var(--brand-black);
+      padding: 4px 9px;
+      border-radius: 5px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.14s;
+    }
+
+    .act-btn:hover {
+      background: #333336;
+      border-color: var(--brand-gold);
+    }
+
+    .act-btn.primary {
+      background: #8f6806;
+      border-color: #6e4f02;
+    }
+
+    .act-btn.active-toggle {
+      background: var(--brand-gold);
+      color: var(--brand-black);
+      border-color: var(--brand-black);
+      font-weight: 800;
+    }
+
+    .act-btn.sim-press, input.sim-press, .pred-opt.sim-press {
+      outline: 3px solid var(--brand-gold);
+      box-shadow: 0 0 14px rgba(255, 215, 0, 0.9);
+    }
+
+    .readout {
+      background: #1a1a1b;
+      color: #f2f2f2;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.72rem;
+      padding: 5px 8px;
+      border-radius: 5px;
+      border-left: 3px solid var(--brand-gold);
+      line-height: 1.28;
+    }
+
+    .challenge-box {
+      background: #fff9e6;
+      border: 1.5px solid #d4a017;
+      border-radius: 8px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .challenge-text {
+      font-size: 0.75rem;
+      line-height: 1.26;
+      color: #2b2618;
+    }
+
+    .challenge-status {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #6b5310;
+    }
+
+    .challenge-status.ok { color: var(--ok-green); }
+    .challenge-status.err { color: var(--err-red); }
+
+    /* ==================== VISTA DE PORTADA ==================== */
+    .cover-wrap {
+      padding: 32px 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      color: #f4f4f5;
+      background:
+        radial-gradient(circle at 82% 22%, rgba(255, 215, 0, 0.15), transparent 45%),
+        linear-gradient(135deg, #171719 0%, #24211d 100%);
+    }
+
+    .cover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.35);
+      padding-bottom: 10px;
+    }
+
+    .cover-school {
+      font-size: 0.82rem;
+      color: var(--brand-gold);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .cover-main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cover-title {
+      font-family: var(--font-serif);
+      font-size: 2.15rem;
+      line-height: 1.12;
+      color: #ffffff;
+    }
+
+    .cover-sub {
+      font-size: 0.93rem;
+      line-height: 1.42;
+      color: #d4d4d8;
+    }
+
+    .cover-index-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 4px;
+    }
+
+    .idx-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 215, 0, 0.28);
+      padding: 9px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .idx-card:hover {
+      background: rgba(255, 215, 0, 0.12);
+      border-color: var(--brand-gold);
+      transform: translateY(-2px);
+    }
+
+    .idx-card h4 {
+      color: var(--brand-gold);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .idx-card p {
+      font-size: 0.75rem;
+      color: #e4e4e7;
+      line-height: 1.25;
+    }
+
+    .cover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 12px;
+    }
+
+    .open-book-btn {
+      background: var(--brand-gold);
+      color: var(--brand-black);
+      border: none;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* ==================== MODAL NOTAS DOCENTES ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--paper);
+      color: var(--ink);
+      max-width: 760px;
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid var(--brand-gold);
+      padding: 18px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.85);
+      user-select: text;
+    }
+
+    .modal-card h3 {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #dfd3b8;
+      padding-bottom: 5px;
+    }
+
+    .modal-card h4 {
+      margin-top: 9px;
+      margin-bottom: 3px;
+      color: #6b5310;
+      font-size: 0.86rem;
+    }
+
+    .modal-card p, .modal-card li {
+      font-size: 0.8rem;
+      line-height: 1.42;
+      margin-bottom: 4px;
+    }
+
+    .modal-card ul { padding-left: 18px; }
+
+    .guide-cursor {
+      position: fixed;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 215, 0, 0.35);
+      border: 2.5px solid var(--brand-gold);
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: left 0.5s ease, top 0.5s ease, opacity 0.2s ease;
+    }
+
+    .guide-cursor.on { opacity: 1; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== BARRA SUPERIOR LIMPIA ==================== -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand-badge">LSFB · 1° MEDIO</span>
+      <strong id="top-title">Portada · Del Subsuelo al Motor</strong>
+    </div>
+
+    <div class="topbar-right">
+      <button class="top-btn" id="btn-book-pose" title="Alternar entre libro inclinado en 3D sobre la mesa o vista plana">
+        📐 Vista: Perspectiva 3D
+      </button>
+      <button class="top-btn" id="btn-tts" title="Escuchar explicación del pliego">▶ Escuchar</button>
+      <button class="top-btn" id="btn-mute" title="Activar o silenciar narración automática">🔊 Voz activa</button>
+      <select class="voice-select" id="voice-select" title="Seleccionar voz en español"></select>
+      <button class="top-btn" id="btn-notes">📋 Notas Docentes</button>
+    </div>
+  </header>
+
+  <!-- ==================== ESCRITORIO 3D RESPONSIVO ==================== -->
+  <main class="desk-viewport" id="desk-viewport">
+    <div class="desk-hint-pill">
+      💡 Arrastra desde el fondo de madera para girar todo el libro en 3D · Usa los botones al pie de cada hoja para avanzar o retroceder
+    </div>
+
+    <div class="book-rig-3d" id="book-rig-3d">
+      <div class="book-table-shadow"></div>
+      <div class="book-hardcover-back"></div>
+      <div class="page-block-edge edge-bottom"></div>
+      <div class="page-block-edge edge-right"></div>
+      <div class="page-block-edge edge-left"></div>
+
+      <div class="turning-leaf" id="turning-leaf"></div>
+
+      <!-- VISTA 0: PORTADA -->
+      <section class="book-surface cover-mode" id="view-cover">
+        <div class="cover-wrap">
+          <div class="cover-header">
+            <span class="cover-school">Liceo San Felipe Benicio · Coyhaique, Chile</span>
+            <span style="font-size:0.78rem; color:#a1a1aa;">Ciencias Naturales — Eje Química · 1° Medio</span>
+          </div>
+
+          <div class="cover-main">
+            <div class="kicker" style="color:var(--brand-gold);">Libro Físico 3D Interactivo</div>
+            <h1 class="cover-title">Del Subsuelo al Motor: Extracción y Refinación del Petróleo</h1>
+            <p class="cover-sub">
+              Manipula el libro sobre la mesa e interactúa con los 6 modelos tridimensionales texturizados: desde los yacimientos de Magallanes hasta las torres de ENAP y la combustión química.
+            </p>
+
+            <div class="cover-index-grid">
+              <div class="idx-card" data-goto="1">
+                <h4>1 · Trampa Geológica</h4>
+                <p>Estratos sedimentarios, porosidad en roca almacén y densidad.</p>
+              </div>
+              <div class="idx-card" data-goto="2">
+                <h4>2 · Bombeo en Magallanes</h4>
+                <p>La «cigüeña» de acero y sus válvulas unidireccionales.</p>
+              </div>
+              <div class="idx-card" data-goto="3">
+                <h4>3 · Separador Trifásico</h4>
+                <p>Decantación industrial de gas, crudo y salmuera en pozo.</p>
+              </div>
+              <div class="idx-card" data-goto="4">
+                <h4>4 · Torre de Destilación</h4>
+                <p>Columna de fraccionamiento térmico y platos colectores.</p>
+              </div>
+              <div class="idx-card" data-goto="5">
+                <h4>5 · Cadenas Moleculares</h4>
+                <p>Hidrocarburos C<sub>3</sub> a C<sub>16</sub> y fuerzas de atracción.</p>
+              </div>
+              <div class="idx-card" data-goto="6">
+                <h4>6 · Reacción de Combustión</h4>
+                <p>Cambio químico (OA 17) y conservación de masa (OA 18).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="cover-footer">
+            <span style="font-size:0.76rem; color:#a1a1aa;">
+              Inclina el libro arrastrando la mesa · Pasa las hojas desde las esquinas inferiores.
+            </span>
+            <button class="open-book-btn" id="btn-open-book">Abrir Libro (Pliego 1) →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA DE PLIEGOS ABIERTOS (1 AL 6) -->
+      <section class="book-surface hidden" id="view-spread">
+        <!-- PÁGINA IZQUIERDA -->
+        <article class="page page-left">
+          <div class="page-top-content">
+            <div class="kicker" id="sp-kicker">Pliego 1 de 6</div>
+            <h2 class="spread-title" id="sp-title">Título</h2>
+            <p class="body-text" id="sp-body"></p>
+            <div class="key-box" id="sp-keybox"></div>
+            <div class="chile-pill" id="sp-note"></div>
+          </div>
+
+          <div class="predict-box">
+            <div class="section-tag">
+              <span>1. Predice antes de probar</span>
+              <span id="pred-badge">Sin responder</span>
+            </div>
+            <p class="predict-q" id="pred-q"></p>
+            <div class="predict-options" id="pred-opts"></div>
+            <div class="flap" id="pred-flap"></div>
+          </div>
+
+          <div class="page-footer-bar">
+            <button class="page-turn-btn" id="btn-turn-prev">← Hoja anterior</button>
+            <span class="folio-num" id="folio-left">Página 2</span>
+          </div>
+        </article>
+
+        <div class="spine"></div>
+
+        <!-- PÁGINA DERECHA -->
+        <article class="page page-right">
+          <div class="stage-space" id="stage-space">
+            <canvas id="three-canvas"></canvas>
+            <div class="css2d-layer" id="labels-layer"></div>
+            <div class="stage-hint">Arrastra aquí para rotar el modelo 3D · Rueda para zoom</div>
+          </div>
+
+          <div class="controls-box">
+            <div class="section-tag">
+              <span>2. Manipula el modelo 3D</span>
+              <span id="ctrl-tag">Interactivo</span>
+            </div>
+            <div id="dynamic-controls"></div>
+            <div class="readout" id="sp-readout"></div>
+          </div>
+
+          <div class="challenge-box">
+            <div class="section-tag"><span>3. Desafío práctico</span></div>
+            <p class="challenge-text" id="chal-desc"></p>
+            <div class="challenge-status" id="chal-status"></div>
+          </div>
+
+          <div class="page-footer-bar">
+            <span class="folio-num" id="folio-right">Página 3</span>
+            <button class="page-turn-btn" id="btn-turn-next">Pasar hoja →</button>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <!-- ==================== MODAL NOTAS DOCENTES ==================== -->
+  <div class="modal-backdrop hidden" id="notes-modal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>Notas Docentes — Liceo San Felipe Benicio (1° Medio)</h3>
+        <button class="act-btn" id="btn-close-notes">✕ Cerrar</button>
+      </div>
+      <h4>1. Articulación Curricular (MINEDUC Chile)</h4>
+      <p>
+        Conecta la separación física de mezclas complejas (Pliegos 1 al 5: extracción y destilación fraccionada en ENAP) con el eje de reacciones químicas de 1° Medio: reacción de combustión (<strong>OA 17</strong>) y Ley de Conservación de la Masa de Lavoisier (<strong>OA 18</strong>) en el Pliego 6.
+      </p>
+      <h4>2. Síntesis conceptual por pliego</h4>
+      <ul>
+        <li><strong>Pliego 1 (Geología):</strong> El crudo se aloja en poros microscópicos (arenisca Springhill, ~22 % porosidad) bajo una lutita impermeable, ordenado por densidad: gas arriba, crudo al medio y salmuera abajo.</li>
+        <li><strong>Pliego 2 y 3 (Extracción y Separación):</strong> Bombeo alternativo por válvulas de retención (check) y decantación trifásica por diferencia de densidad e inmiscibilidad agua-hidrocarburo.</li>
+        <li><strong>Pliego 4 y 5 (Destilación y Moléculas):</strong> Gradiente térmico (370 °C a 20 °C). A mayor longitud de cadena carbonada, mayores son las fuerzas intermoleculares de London y más alto es el punto de ebullición.</li>
+        <li><strong>Pliego 6 (Combustión):</strong> Cambio químico balanceado (<span class="chem-eq">1 C<sub>3</sub>H<sub>8</sub> + 5 O<sub>2</sub> → 3 CO<sub>2</sub> + 4 H<sub>2</sub>O</span>).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="guide-cursor" id="guide-cursor"></div>
+
+  <script>
+    /********************************************************************
+     * 1. CONTENIDO DE LOS 6 PLIEGOS
+     ********************************************************************/
+    const SPREADS_DATA = {
+      1: {
+        kicker: 'Pliego 1 de 6 · Cuenca de Magallanes — Geología del yacimiento',
+        title: 'La trampa geológica: poros y densidad',
+        bodyText: 'El petróleo no forma «lagos subterráneos». Entre 1.500 y 3.500 m de profundidad en Magallanes, se aloja en los poros microscópicos de una roca almacén permeable (arenisca), retenido bajo una roca sello impermeable plegada en domo (anticlinal).',
+        keyBoxHtml: `
+          <strong>Orden vertical por densidad dentro de los poros:</strong>
+          Gas (<span class="chem-eq">ρ ≈ 0,18 g/cm<sup>3</sup></span>, cima) &lt;
+          Petróleo crudo (<span class="chem-eq">ρ ≈ 0,84 g/cm<sup>3</sup></span>, medio) &lt;
+          Agua salada (<span class="chem-eq">ρ ≈ 1,07 g/cm<sup>3</sup></span>, base).
+        `,
+        noteHtml: '<strong>Chile (Magallanes):</strong> En 1945 brotó en Manantiales (Tierra del Fuego) el pozo N.° 1 a 2.258 m tras perforar la roca sello de la formación Springhill.',
+        predictQ: '¿Dónde se acumula realmente el petróleo bajo tierra?',
+        options: [
+          { id: 'a', text: 'A) En una caverna hueca subterránea como una laguna.', ok: false,
+            exp: 'A más de 2.000 m la presión aplastaría cualquier cueva hueca; el crudo resiste dentro de los poros microscópicos de la roca sólida.' },
+          { id: 'b', text: 'B) En los poros microscópicos de una roca permeable, bajo una roca sello y sobre agua salada.', ok: true,
+            exp: '¡Exacto! La arenisca actúa como esponja rígida (22 % porosidad) y los fluidos se ordenan por densidad.' },
+          { id: 'c', text: 'C) Mezclado con el magma volcánico a más de 800 °C.', ok: false,
+            exp: 'El calor magmático destruiría las moléculas orgánicas; el petróleo se forma en cuencas sedimentarias.' }
+        ],
+        challengeDesc: 'Abre el «Corte del estrato» (> 50 %), ubica la torre en el flanco petrolífero (100 a 240 m) y presiona «Perforar pozo» sin pinchar el gas ni el agua.',
+        narrationText: 'En Magallanes el petróleo no está en cuevas huecas, sino en los poros microscópicos de la roca arenisca. Responde la predicción izquierda. Luego abre el Corte del estrato, explora el Zoom a los poros y ubica la torre en la franja media para perforar solo petróleo crudo.',
+        cues: [
+          { timeMs: 6500, selector: '#pred-opts' },
+          { timeMs: 10500, selector: '#ctrl-slice' },
+          { timeMs: 14000, selector: '#btn-pore' },
+          { timeMs: 18000, selector: '#btn-drill' }
+        ]
+      },
+
+      2: {
+        kicker: 'Pliego 2 de 6 · Tierra del Fuego — Extracción mecánica',
+        title: 'El bombeo mecánico («cigüeña») y sus válvulas',
+        bodyText: 'Cuando decae la presión natural del yacimiento, el balancín superficial («cigüeña») mueve un pistón en el fondo del pozo. Dos válvulas unidireccionales (check) se abren y cierran por turnos para levantar la columna de crudo.',
+        keyBoxHtml: `
+          <strong>Trabajo sincronizado de las 2 válvulas en el fondo:</strong>
+          • <strong>Al subir el pistón:</strong> Se cierra la <em>válvula viajera</em> (levanta el crudo) y se abre la <em>válvula fija</em> (aspira más crudo).<br/>
+          • <strong>Al bajar el pistón:</strong> Se cierra la válvula fija y se abre la viajera para dejar pasar el fluido arriba del pistón.
+        `,
+        noteHtml: '<strong>Chile (ENAP):</strong> Las «cigüeñas» operan en Cullen y Sombrero (Tierra del Fuego) extrayendo crudo las 24 horas.',
+        predictQ: 'Cuando el pistón sube hacia la superficie, ¿cómo actúan las dos válvulas?',
+        options: [
+          { id: 'a', text: 'A) Ambas quedan abiertas todo el tiempo.', ok: false,
+            exp: 'Si ambas quedan abiertas, el petróleo solo subiría y bajaría en el mismo sitio sin ascender.' },
+          { id: 'b', text: 'B) La válvula viajera se cierra para levantar el crudo y la fija inferior se abre para succionar.', ok: true,
+            exp: '¡Correcto! Así el pistón sostiene el peso de la columna líquida mientras aspira petróleo nuevo desde la roca.' },
+          { id: 'c', text: 'C) Ambas se cierran herméticamente bloqueando el tubo.', ok: false,
+            exp: 'Si la válvula fija inferior no se abre al subir el pistón, se formaría vacío sin entrar petróleo.' }
+        ],
+        challengeDesc: 'Ajusta la «Velocidad de bombeo» entre 8 y 12 SPM y la «Presión en cabeza» entre 12 y 18 bar para lograr un bombeo continuo sin cavitación.',
+        narrationText: 'Cuando baja la presión del pozo, esta cigüeña bombea el petróleo usando dos válvulas que abren y cierran alternadamente. Responde la predicción izquierda. Luego calibra la Velocidad de bombeo entre ocho y doce golpes por minuto y la Presión en cabeza entre doce y dieciocho bar.',
+        cues: [
+          { timeMs: 7500, selector: '#pred-opts' },
+          { timeMs: 12000, selector: '#ctrl-spm' },
+          { timeMs: 17000, selector: '#ctrl-whp' }
+        ]
+      },
+
+      3: {
+        kicker: 'Pliego 3 de 6 · Batería de recepción — Separación en pozo',
+        title: 'Separación primaria: el separador trifásico',
+        bodyText: 'Del pozo emerge una mezcla turbulenta de gas natural, petróleo crudo y agua salada. En el cilindro separador horizontal, el gas escapa por arriba y los líquidos decantan por gravedad: el agua pesada queda retenida antes del vertedero y el petróleo flota y rebalsa.',
+        keyBoxHtml: `
+          <strong>Inmiscibilidad y densidad:</strong>
+          El agua polar (<span class="chem-eq">H<sub>2</sub>O</span>, <span class="chem-eq">ρ ≈ 1,07 g/cm<sup>3</sup></span>) decanta al fondo; el petróleo apolar (<span class="chem-eq">ρ ≈ 0,84 g/cm<sup>3</sup></span>) flota sobre ella y salta el tabique vertedero.
+        `,
+        noteHtml: '<strong>Chile (Cabo Negro y Gregorio):</strong> El gas separado va a Cabo Negro y el crudo estabilizado se embarca hacia las refinerías del centro-sur.',
+        predictQ: '¿Por qué el petróleo crudo logra saltar el tabique vertedero mientras el agua queda retenida?',
+        options: [
+          { id: 'a', text: 'A) Porque el crudo es menos denso que el agua salada, flota sobre ella y rebalsa por arriba.', ok: true,
+            exp: '¡Exacto! Con densidad 0,84 frente a 1,07 g/cm³ de la salmuera, el crudo forma la capa superior y pasa a su cámara colectora.' },
+          { id: 'b', text: 'B) Porque un electroimán atrae el petróleo hacia la salida derecha.', ok: false,
+            exp: 'Los hidrocarburos no son magnéticos; todo ocurre por gravedad e inmiscibilidad.' },
+          { id: 'c', text: 'C) Porque el agua salada sale por la chimenea superior de gas.', ok: false,
+            exp: 'El agua es el componente más denso y se drena líquida por la tubería inferior.' }
+        ],
+        challengeDesc: 'Regula la «Válvula drenaje agua» entre 45 % y 65 % y el «Tiempo de residencia» en ≥ 6 min para obtener crudo al 99 % sin arrastre de agua.',
+        narrationText: 'Lo que sale del pozo trae gas, crudo y salmuera revueltos. En este separador horizontal el gas sube, el agua decanta al fondo y el petróleo flota saltando el tabique amarillo. Ajusta la Válvula de drenaje de agua y el Tiempo de residencia para obtener crudo puro.',
+        cues: [
+          { timeMs: 7500, selector: '#pred-opts' },
+          { timeMs: 12500, selector: '#ctrl-water-valve' },
+          { timeMs: 17000, selector: '#ctrl-residence' }
+        ]
+      },
+
+      4: {
+        kicker: 'Pliego 4 de 6 · Refinerías ENAP — Separación física térmica',
+        title: 'Destilación fraccionada: la torre y sus platos',
+        bodyText: 'El crudo limpio sigue siendo una mezcla de muchos hidrocarburos. En la refinería se calienta a ~370 °C sin oxígeno y sus vapores suben por una torre que se enfría hacia la cima: cada derivado se condensa en el plato que coincide con su punto de ebullición.',
+        keyBoxHtml: `
+          <strong>Cortes por temperatura de ebullición:</strong>
+          <strong>Cima (&lt;40 °C):</strong> GLP (<span class="chem-eq">C<sub>3</sub>–C<sub>4</sub></span>) ·
+          <strong>110 °C:</strong> Gasolina (<span class="chem-eq">C<sub>5</sub>–C<sub>10</sub></span>) ·
+          <strong>210 °C:</strong> Kerosene Jet (<span class="chem-eq">C<sub>11</sub>–C<sub>14</sub></span>) ·
+          <strong>290 °C:</strong> Diésel (<span class="chem-eq">C<sub>15</sub>–C<sub>20</sub></span>).
+        `,
+        noteHtml: '<strong>Chile (Concón y Hualpén):</strong> Las refinerías Aconcagua y Bío Bío de ENAP destilan el crudo para abastecer de combustibles al país.',
+        predictQ: 'Al subir el vapor caliente por la torre, ¿qué moléculas se licúan (condensan) primero en los platos bajos?',
+        options: [
+          { id: 'a', text: 'A) Las más livianas (gas licuado), porque pesan menos.', ok: false,
+            exp: 'Las moléculas livianas hierven bajo cero, por lo que siguen como gas hasta la cima fría de la torre.' },
+          { id: 'b', text: 'B) Las de cadena larga (diésel), porque tienen alto punto de ebullición (250–350 °C).', ok: true,
+            exp: '¡Excelente! Al requerir tanta temperatura para ser gas, apenas suben un poco y se enfrían a ~290 °C vuelven al estado líquido.' },
+          { id: 'c', text: 'C) Todas condensan juntas en el mismo plato.', ok: false,
+            exp: 'El gradiente térmico de la torre las separa en alturas distintas según su punto de ebullición.' }
+        ],
+        challengeDesc: 'Para abastecer un avión hacia Coyhaique con Kerosene Jet A-1 (ebullición 180–250 °C), sube el horno a ≥ 370 °C y selecciona el plato colector correspondiente.',
+        narrationText: 'En la torre de destilación fraccionada el petróleo hierve sin quemarse. Los vapores suben y cada fracción condensa a distinta altura según su punto de ebullición. Calienta el horno a más de trescientos setenta grados y selecciona el plato exacto donde condensa el kerosene de aviación.',
+        cues: [
+          { timeMs: 7500, selector: '#pred-opts' },
+          { timeMs: 12000, selector: '#ctrl-furnace' },
+          { timeMs: 16500, selector: '#tray-btns' }
+        ]
+      },
+
+      5: {
+        kicker: 'Pliego 5 de 6 · Escala molecular — Estructura y fuerzas de atracción',
+        title: 'Moléculas de hidrocarburos: largo de cadena',
+        bodyText: 'Los hidrocarburos están formados solo por Carbono (gris) e Hidrógeno (blanco). Cuanto más larga es la cadena de carbonos, mayor es la superficie de contacto y más intensas son las fuerzas de atracción intermoleculares entre cadenas vecinas, elevando su punto de ebullición.',
+        keyBoxHtml: `
+          <strong>Comparación de alcanos (<span class="chem-eq">C<sub>n</sub>H<sub>2n+2</sub></span>):</strong>
+          • <strong>Propano (<span class="chem-eq">C<sub>3</sub>H<sub>8</sub></span>):</strong> Ebullición <span class="chem-eq">−42 °C</span> (Gas) ·
+          <strong>Octano / Bencina (<span class="chem-eq">C<sub>8</sub>H<sub>18</sub></span>):</strong> Ebullición <span class="chem-eq">125 °C</span> (Líquido)<br/>
+          • <strong>Hexadecano / Diésel (<span class="chem-eq">C<sub>16</sub>H<sub>34</sub></span>):</strong> Ebullición <span class="chem-eq">287 °C</span> (Líquido viscoso).
+        `,
+        noteHtml: '<strong>Patagonia en invierno:</strong> Bajo −10 °C en Coyhaique, las cadenas largas del diésel (<span class="chem-eq">C<sub>16</sub></span>) tienden a aglomerarse, requiriendo aditivos anticongelantes.',
+        predictQ: '¿Por qué cuesta mucho más calor evaporar diésel (C₁₆H₃₄) que gas propano (C₃H₈)?',
+        options: [
+          { id: 'a', text: 'A) Porque sus cadenas largas se atraen entre sí con mayor fuerza intermolecular.', ok: true,
+            exp: '¡Exacto! Las fuerzas de dispersión (London) crecen con el tamaño de la cadena; hace falta más energía térmica para separarlas.' },
+          { id: 'b', text: 'B) Porque al hervir se rompen los enlaces covalentes internos C–C.', ok: false,
+            exp: 'Hervir es un cambio físico: solo separa una molécula de su vecina sin romper sus enlaces internos.' },
+          { id: 'c', text: 'C) Porque el propano contiene helio en su fórmula.', ok: false,
+            exp: 'Ambos contienen exclusivamente átomos de carbono e hidrógeno.' }
+        ],
+        challengeDesc: 'Revisa las 3 moléculas con los botones (C₃H₈, C₈H₁₈ y C₁₆H₃₄) y luego deja seleccionado el Octano (C₈H₁₈) exactamente a 150 °C para verlo en estado gaseoso.',
+        narrationText: 'Observa las cadenas moleculares de carbono e hidrógeno en tres D. Las cadenas largas se atraen con mucha más fuerza entre sí que las cortas. Inspecciona las tres moléculas con los botones y luego ajusta el Octano exactamente a ciento cincuenta grados Celsius.',
+        cues: [
+          { timeMs: 7000, selector: '#pred-opts' },
+          { timeMs: 11500, selector: '#mol-btns' },
+          { timeMs: 16500, selector: '#ctrl-mol-temp' }
+        ]
+      },
+
+      6: {
+        kicker: 'Pliego 6 de 6 · Reacciones Químicas (OA 17 y OA 18) — Cambio químico',
+        title: 'De la separación física a la reacción de combustión',
+        bodyText: 'Destilar solo separó moléculas existentes (cambio físico). Al quemar el combustible en un motor o estufa ocurre una reacción química de combustión (OA 17): se rompen enlaces y los átomos se reordenan con el oxígeno formando CO₂ y H₂O, conservando la masa total (Lavoisier, OA 18).',
+        keyBoxHtml: `
+          <strong>Combustión completa balanceada del propano:</strong>
+          <span class="chem-eq">1 C<sub>3</sub>H<sub>8</sub> + 5 O<sub>2</sub> → 3 CO<sub>2</sub> + 4 H<sub>2</sub>O + Energía</span>
+          (Se conservan <strong>3 C</strong>, <strong>8 H</strong> y <strong>10 O</strong> antes y después).
+        `,
+        noteHtml: '<strong>Calidad del aire en Coyhaique:</strong> Si falta oxígeno (<span class="chem-eq">&lt; 5 O<sub>2</sub></span>), ocurre combustión incompleta generando monóxido (<span class="chem-eq">CO</span>) y hollín (<span class="chem-eq">C</span>).',
+        predictQ: 'Al quemarse 1 molécula de propano (C₃H₈), ¿qué pasa con la masa de sus 3 carbonos y 8 hidrógenos?',
+        options: [
+          { id: 'a', text: 'A) Desaparecen convirtiéndose íntegramente en fuego sin masa.', ok: false,
+            exp: 'Por la Ley de Conservación de la Masa (OA 18), ningún átomo desaparece: pasan al aire como gases CO₂ y H₂O.' },
+          { id: 'b', text: 'B) Se conservan todos: se reordenan con 5 O₂ formando 3 CO₂ y 4 H₂O.', ok: true,
+            exp: '¡Brillante! Los 3 C forman 3 CO₂ y los 8 H forman 4 H₂O consumiendo exactamente 10 átomos de oxígeno (5 O₂).' },
+          { id: 'c', text: 'C) Se transforman en átomos metálicos dentro del motor.', ok: false,
+            exp: 'Las reacciones químicas reordenan átomos, jamás cambian un elemento químico en otro.' }
+        ],
+        challengeDesc: 'Ajusta las «Moléculas de O₂» a la proporción estequiométrica exacta (5 O₂) y presiona «⚡ Accionar chispa» para lograr una combustión completa.',
+        narrationText: 'Cerramos el libro pasando del cambio físico al cambio químico de primero medio. Para quemar una molécula de propano sin producir hollín ni monóxido, ajusta el control a cinco moléculas de oxígeno y presiona Accionar chispa verificando la ley de conservación de la masa.',
+        cues: [
+          { timeMs: 7500, selector: '#pred-opts' },
+          { timeMs: 12500, selector: '#ctrl-o2' },
+          { timeMs: 17000, selector: '#btn-spark' }
+        ]
+      }
+    };
+
+    /********************************************************************
+     * 2. ESTADO GLOBAL Y AUTO-ESCALADO RESPONSIVO DEL LIBRO EN LA MESA
+     ********************************************************************/
+    const BookState = {
+      currentSpread: 0,
+      muted: localStorage.getItem('lsfb_petroleo_v4_muted') === 'true',
+      completed: JSON.parse(localStorage.getItem('lsfb_petroleo_v4_done') || '{}'),
+      predictions: {},
+      bookPose: {
+        is3D: true,
+        rotX: 14,
+        rotY: -6,
+        rotZ: 1.0,
+        scale: 1
+      },
+      s1: { slice: 35, rigX: 0, poreMode: false, inspected: false, drilling: false, drillProgress: 0, targetDepth: 1.4 },
+      s2: { spm: 5, whp: 8 },
+      s3: { waterValve: 25, residence: 3 },
+      s4: { furnaceTemp: 310, selectedTray: 1 },
+      s5: { molType: 'c3', temp: 20, visited: { c3: true, c8: false, c16: false } },
+      s6: { o2Count: 3, reacted: false, animProgress: 0 }
+    };
+
+    const bookRig3D = document.getElementById('book-rig-3d');
+    const deskViewport = document.getElementById('desk-viewport');
+    const btnBookPose = document.getElementById('btn-book-pose');
+
+    // Calcula la escala exacta para que el libro de 1260x700 jamás se corte en ninguna pantalla
+    function computeResponsiveBookScale() {
+      const vw = deskViewport.clientWidth;
+      const vh = deskViewport.clientHeight;
+      // Margen extra cuando el libro está inclinado en perspectiva 3D
+      const padW = BookState.bookPose.is3D ? 110 : 48;
+      const padH = BookState.bookPose.is3D ? 95 : 44;
+      const sx = (vw - padW) / 1260;
+      const sy = (vh - padH) / 700;
+      BookState.bookPose.scale = Math.max(0.45, Math.min(1.06, Math.min(sx, sy)));
+    }
+
+    function applyBookRigTransform() {
+      computeResponsiveBookScale();
+      const p = BookState.bookPose;
+      bookRig3D.style.transform = `scale(${p.scale}) rotateX(${p.rotX}deg) rotateY(${p.rotY}deg) rotateZ(${p.rotZ}deg)`;
+      btnBookPose.textContent = p.is3D ? '📐 Vista: Perspectiva 3D' : '📖 Vista: Lectura Plana';
+      btnBookPose.classList.toggle('active', p.is3D);
+    }
+    applyBookRigTransform();
+
+    btnBookPose.addEventListener('click', () => {
+      BookState.bookPose.is3D = !BookState.bookPose.is3D;
+      if (BookState.bookPose.is3D) {
+        BookState.bookPose.rotX = 14;
+        BookState.bookPose.rotY = -6;
+        BookState.bookPose.rotZ = 1.0;
+      } else {
+        BookState.bookPose.rotX = 0;
+        BookState.bookPose.rotY = 0;
+        BookState.bookPose.rotZ = 0;
+      }
+      applyBookRigTransform();
+      setTimeout(onResizeThree, 90);
+    });
+
+    let deskDrag = { active: false, x: 0, y: 0 };
+    deskViewport.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('#stage-space') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.idx-card')) {
+        return;
+      }
+      deskDrag.active = true;
+      deskDrag.x = e.clientX;
+      deskDrag.y = e.clientY;
+      deskViewport.setPointerCapture(e.pointerId);
+    });
+    deskViewport.addEventListener('pointermove', (e) => {
+      if (!deskDrag.active) return;
+      const dx = e.clientX - deskDrag.x;
+      const dy = e.clientY - deskDrag.y;
+      deskDrag.x = e.clientX;
+      deskDrag.y = e.clientY;
+      BookState.bookPose.is3D = true;
+      BookState.bookPose.rotY = Math.max(-25, Math.min(25, BookState.bookPose.rotY + dx * 0.16));
+      BookState.bookPose.rotX = Math.max(0, Math.min(30, BookState.bookPose.rotX - dy * 0.14));
+      applyBookRigTransform();
+    });
+    deskViewport.addEventListener('pointerup', (e) => {
+      if (!deskDrag.active) return;
+      deskDrag.active = false;
+      deskViewport.releasePointerCapture(e.pointerId);
+    });
+
+    function markSpreadSolved(idx) {
+      BookState.completed[idx] = true;
+      localStorage.setItem('lsfb_petroleo_v4_done', JSON.stringify(BookState.completed));
+    }
+
+    /********************************************************************
+     * 3. GENERADOR DE TEXTURAS PROCEDURALES REALISTAS (CanvasTexture + BumpMap)
+     ********************************************************************/
+    const ProceduralTextures = {
+      // Textura de estratos sedimentarios y vetas de roca
+      createStrataTexture(baseHex, stripeHex, grainIntensity = 28) {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 256;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = baseHex;
+        ctx.fillRect(0, 0, 256, 256);
+
+        // Vetas horizontales sedimentarias
+        for (let y = 0; y < 256; y += 5) {
+          ctx.fillStyle = stripeHex;
+          ctx.globalAlpha = 0.12 + (Math.sin(y * 0.15) + 1) * 0.1;
+          ctx.fillRect(0, y, 256, 2 + (y % 3));
+        }
+        ctx.globalAlpha = 1;
+
+        // Granulado mineral (ruido de poro y cuarzo)
+        const img = ctx.getImageData(0, 0, 256, 256);
+        const d = img.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const n = (Math.random() - 0.5) * grainIntensity;
+          d[i]   = Math.min(255, Math.max(0, d[i] + n));
+          d[i+1] = Math.min(255, Math.max(0, d[i+1] + n));
+          d[i+2] = Math.min(255, Math.max(0, d[i+2] + n));
+        }
+        ctx.putImageData(img, 0, 0);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(2, 1);
+        return tex;
+      },
+
+      // Textura de acero industrial cepillado con costuras y remaches
+      createBrushedMetalTexture(baseHex, seamHex) {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 256;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = baseHex;
+        ctx.fillRect(0, 0, 256, 256);
+
+        // Líneas de cepillado metálico
+        for (let i = 0; i < 400; i++) {
+          ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#000000';
+          ctx.globalAlpha = 0.04;
+          ctx.fillRect(0, Math.random() * 256, 256, 1);
+        }
+        ctx.globalAlpha = 0.35;
+        ctx.strokeStyle = seamHex;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(4, 4, 248, 248);
+
+        // Hilera de remaches industriales
+        ctx.fillStyle = seamHex;
+        for (let x = 16; x < 250; x += 28) {
+          ctx.beginPath(); ctx.arc(x, 14, 3, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(x, 242, 3, 0, Math.PI * 2); ctx.fill();
+        }
+        const tex = new THREE.CanvasTexture(c);
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        return tex;
+      },
+
+      // Textura de fluido viscoso / irisado para crudo y salmuera
+      createFluidTexture(hex1, hex2) {
+        const c = document.createElement('canvas');
+        c.width = 128; c.height = 128;
+        const ctx = c.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 128, 128);
+        grad.addColorStop(0, hex1);
+        grad.addColorStop(0.5, hex2);
+        grad.addColorStop(1, hex1);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+        ctx.lineWidth = 2;
+        for (let y = 12; y < 128; y += 22) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.bezierCurveTo(40, y - 8, 80, y + 8, 128, y);
+          ctx.stroke();
+        }
+        const tex = new THREE.CanvasTexture(c);
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        return tex;
+      }
+    };
+
+    const TEX = {
+      topSoil:   ProceduralTextures.createStrataTexture('#b89f72', '#8c7248', 35),
+      capRock:   ProceduralTextures.createStrataTexture('#4a525d', '#2c323b', 26),
+      baseRock:  ProceduralTextures.createStrataTexture('#36312c', '#1e1b18', 40),
+      sandGrain: ProceduralTextures.createStrataTexture('#d8c398', '#a89064', 48),
+      crudeOil:  ProceduralTextures.createFluidTexture('#4a2508', '#7c4011'),
+      brine:     ProceduralTextures.createFluidTexture('#134e7a', '#2176b5'),
+      gas:       ProceduralTextures.createFluidTexture('#1b8a7e', '#3ad1c2'),
+      steelDark: ProceduralTextures.createBrushedMetalTexture('#383e47', '#181b20'),
+      steelGold: ProceduralTextures.createBrushedMetalTexture('#eab308', '#854d0e')
+    };
+
+    /********************************************************************
+     * 4. ESCENA THREE.JS CON GEOMETRÍAS Y MATERIALES DETALLADOS
+     ********************************************************************/
+    const canvas = document.getElementById('three-canvas');
+    const stageSpace = document.getElementById('stage-space');
+    const labelsLayer = document.getElementById('labels-layer');
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1e242d);
+
+    const camera = new THREE.PerspectiveCamera(40, 1.6, 0.1, 100);
+    camera.position.set(0, 3.6, 7.6);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Iluminación de estudio con luz hemisférica + principal + contra-luz cálida
+    scene.add(new THREE.HemisphereLight(0xfffbeb, 0x334155, 0.68));
+    const keyLight = new THREE.DirectionalLight(0xfff7ed, 0.92);
+    keyLight.position.set(6, 10, 8);
+    scene.add(keyLight);
+    const rimLight = new THREE.DirectionalLight(0x93c5fd, 0.48);
+    rimLight.position.set(-7, 4, -6);
+    scene.add(rimLight);
+
+    const orbit = { theta: 0.24, phi: 1.12, radius: 7.8, target: new THREE.Vector3(0, 0, 0), dragging: false, px: 0, py: 0 };
+    function applyOrbit() {
+      orbit.phi = Math.max(0.35, Math.min(1.5, orbit.phi));
+      orbit.radius = Math.max(4.2, Math.min(13.0, orbit.radius));
+      camera.position.x = orbit.target.x + orbit.radius * Math.sin(orbit.phi) * Math.sin(orbit.theta);
+      camera.position.y = orbit.target.y + orbit.radius * Math.cos(orbit.phi);
+      camera.position.z = orbit.target.z + orbit.radius * Math.sin(orbit.phi) * Math.cos(orbit.theta);
+      camera.lookAt(orbit.target);
+    }
+    applyOrbit();
+
+    canvas.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      orbit.dragging = true;
+      orbit.px = e.clientX;
+      orbit.py = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!orbit.dragging) return;
+      orbit.theta -= (e.clientX - orbit.px) * 0.008;
+      orbit.phi -= (e.clientY - orbit.py) * 0.008;
+      orbit.px = e.clientX;
+      orbit.py = e.clientY;
+      applyOrbit();
+    });
+    canvas.addEventListener('pointerup', (e) => {
+      orbit.dragging = false;
+      canvas.releasePointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      orbit.radius += e.deltaY * 0.004;
+      applyOrbit();
+    }, { passive: false });
+
+    const spreadGroups = {};
+    for (let i = 1; i <= 6; i++) {
+      spreadGroups[i] = new THREE.Group();
+      spreadGroups[i].visible = false;
+      scene.add(spreadGroups[i]);
+    }
+
+    let activeLabels = [];
+    function setSpreadLabels(defs) {
+      labelsLayer.innerHTML = '';
+      activeLabels = defs.map((d) => {
+        const el = document.createElement('div');
+        el.className = 'lbl';
+        el.textContent = d.text;
+        labelsLayer.appendChild(el);
+        return { ...d, el };
+      });
+    }
+
+    function updateLabels2D() {
+      if (BookState.currentSpread === 0) return;
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (w === 0) return;
+      const grp = spreadGroups[BookState.currentSpread];
+
+      activeLabels.forEach((lbl) => {
+        if (lbl.visibleFn && !lbl.visibleFn()) {
+          lbl.el.style.display = 'none';
+          return;
+        }
+        const v = lbl.pos.clone().applyMatrix4(grp.matrixWorld).project(camera);
+        const x = (v.x * 0.5 + 0.5) * w;
+        const y = (-v.y * 0.5 + 0.5) * h;
+        if (v.z > 1 || x < 14 || x > w - 14 || y < 12 || y > h - 12) {
+          lbl.el.style.display = 'none';
+        } else {
+          lbl.el.style.display = 'block';
+          lbl.el.style.left = `${x}px`;
+          lbl.el.style.top = `${y}px`;
+        }
+      });
+    }
+
+    /* ------------------------------------------------------------------
+     * ESCENA 1 TEXTURIZADA: ESTRATOS CON RELIEVE + TORRE RETICULADA
+     * ------------------------------------------------------------------ */
+    const s1Refs = {};
+    (function buildScene1() {
+      const g = spreadGroups[1];
+      const macro = new THREE.Group(), pore = new THREE.Group();
+      pore.visible = false;
+      g.add(macro, pore);
+      s1Refs.macro = macro; s1Refs.pore = pore;
+
+      const archY = (x) => 0.72 * Math.cos(x * 0.62);
+      s1Refs.archY = archY;
+
+      function makeTexturedLayer(yTopFn, yBotFn, matOptions, zF, zB) {
+        const segX = 44, w = 5.0;
+        const geom = new THREE.BufferGeometry();
+        const pos = [], uvs = [], idx = [];
+        for (let i = 0; i <= segX; i++) {
+          const u = i / segX;
+          const x = -w / 2 + u * w;
+          const yt = yTopFn(x), yb = yBotFn(x);
+          pos.push(x, yt, zF, x, yb, zF, x, yt, zB, x, yb, zB);
+          uvs.push(u * 2, 1, u * 2, 0, u * 2, 1, u * 2, 0);
+        }
+        for (let i = 0; i < segX; i++) {
+          const b = i * 4;
+          idx.push(b, b+1, b+5, b, b+5, b+4, b+2, b+6, b+7, b+2, b+7, b+3, b, b+4, b+6, b, b+6, b+2, b+1, b+3, b+7, b+1, b+7, b+5);
+        }
+        const L = segX * 4;
+        idx.push(0, 2, 3, 0, 3, 1, L, L+1, L+3, L, L+3, L+2);
+        geom.setIndex(idx);
+        geom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geom.computeVertexNormals();
+        return new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, ...matOptions }));
+      }
+
+      const GOC = 0.55, OWC = 0.08;
+      // Estrato superior estepa
+      macro.add(makeTexturedLayer(() => 1.5, (x) => Math.max(0.85, archY(x) + 0.5),
+        { map: TEX.topSoil, bumpMap: TEX.topSoil, bumpScale: 0.04, roughness: 0.85 }, 0.8, -1.1));
+      // Roca sello lutita
+      macro.add(makeTexturedLayer((x) => archY(x) + 0.5, (x) => archY(x) + 0.14,
+        { map: TEX.capRock, bumpMap: TEX.capRock, bumpScale: 0.03, roughness: 0.7 }, 0.8, -1.1));
+      // Casquete de gas
+      macro.add(makeTexturedLayer((x) => Math.max(GOC, archY(x) + 0.14), (x) => Math.max(GOC, archY(x) - 0.6),
+        { map: TEX.gas, bumpMap: TEX.sandGrain, bumpScale: 0.05, roughness: 0.5 }, 0.8, -1.1));
+      // Franja de Petróleo Crudo (brillo bituminoso)
+      macro.add(makeTexturedLayer((x) => Math.max(OWC, Math.min(GOC, archY(x) + 0.14)), (x) => Math.max(OWC, Math.min(GOC, archY(x) - 0.6)),
+        { map: TEX.crudeOil, bumpMap: TEX.sandGrain, bumpScale: 0.05, roughness: 0.35, metalness: 0.15 }, 0.8, -1.1));
+      // Salmuera
+      macro.add(makeTexturedLayer((x) => Math.min(OWC, archY(x) + 0.14), (x) => Math.min(OWC, archY(x) - 0.6),
+        { map: TEX.brine, bumpMap: TEX.sandGrain, bumpScale: 0.04, roughness: 0.4 }, 0.8, -1.1));
+      // Roca madre basal
+      macro.add(makeTexturedLayer((x) => archY(x) - 0.6, () => -1.5,
+        { map: TEX.baseRock, bumpMap: TEX.baseRock, bumpScale: 0.06, roughness: 0.88 }, 0.8, -1.1));
+
+      // Bloque de corte frontal deslizable con textura estratificada
+      const curtain = makeTexturedLayer(() => 1.5, () => -1.5,
+        { map: TEX.topSoil, bumpMap: TEX.baseRock, bumpScale: 0.05, roughness: 0.82 }, 1.25, 0.8);
+      macro.add(curtain);
+      s1Refs.curtain = curtain;
+
+      // Torre de perforación reticulada realista
+      const rig = new THREE.Group();
+      const basePlat = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.1, 0.56), new THREE.MeshStandardMaterial({ map: TEX.steelDark, metalness: 0.6, roughness: 0.4 }));
+      basePlat.position.y = 1.55;
+      rig.add(basePlat);
+
+      // Estructura de celosía de la torre (4 patas + anillos horizontales)
+      const derrickSolid = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.9, 4, 4, true), new THREE.MeshStandardMaterial({ color: 0xffd700, wireframe: true }));
+      derrickSolid.position.y = 2.02;
+      derrickSolid.rotation.y = Math.PI / 4;
+      rig.add(derrickSolid);
+
+      const crown = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.16), new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.5 }));
+      crown.position.y = 2.48;
+      rig.add(crown);
+
+      const pipeG = new THREE.CylinderGeometry(0.042, 0.042, 1, 14);
+      pipeG.translate(0, -0.5, 0);
+      const pipe = new THREE.Mesh(pipeG, new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 }));
+      pipe.position.set(0, 1.5, 0.84);
+      pipe.scale.y = 0.01;
+      rig.add(pipe);
+      s1Refs.rig = rig; s1Refs.pipe = pipe;
+      macro.add(rig);
+
+      // Vista microscópica de poros con granos de cuarzo rugosos (bumpMap)
+      const grainMat = new THREE.MeshStandardMaterial({
+        map: TEX.sandGrain,
+        bumpMap: TEX.sandGrain,
+        bumpScale: 0.06,
+        roughness: 0.72,
+        transparent: true,
+        opacity: 0.78
+      });
+      for (let ix = -1; ix <= 1; ix++) {
+        for (let iy = -1; iy <= 1; iy++) {
+          for (let iz = -1; iz <= 1; iz++) {
+            if (ix === 0 && iz === 1) continue;
+            const m = new THREE.Mesh(new THREE.DodecahedronGeometry(0.46, 2), grainMat);
+            m.position.set(ix * 0.92, iy * 0.82, iz * 0.75);
+            m.rotation.set(ix * 0.7, iy * 1.1, iz * 0.5);
+            pore.add(m);
+          }
+        }
+      }
+      const drops = [];
+      [
+        { y: 0.7, mat: new THREE.MeshStandardMaterial({ map: TEX.gas, roughness: 0.2, metalness: 0.1 }) },
+        { y: 0.0, mat: new THREE.MeshStandardMaterial({ map: TEX.crudeOil, roughness: 0.15, metalness: 0.25 }) },
+        { y: -0.7, mat: new THREE.MeshStandardMaterial({ map: TEX.brine, roughness: 0.2, metalness: 0.1 }) }
+      ].forEach((b) => {
+        for (let i = 0; i < 12; i++) {
+          const d = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), b.mat);
+          const a = (i / 12) * Math.PI * 2;
+          d.position.set(Math.cos(a) * 0.65, b.y + ((i % 2) - 0.5) * 0.2, Math.sin(a) * 0.55);
+          pore.add(d);
+          drops.push({ mesh: d, by: d.position.y, ph: i });
+        }
+      });
+      s1Refs.drops = drops;
+    })();
+
+    /* ------------------------------------------------------------------
+     * ESCENA 2 TEXTURIZADA: CIGÜEÑA ENAP CON PERFILES EN "I" Y REMACHE
+     * ------------------------------------------------------------------ */
+    const s2Refs = {};
+    (function buildScene2() {
+      const g = spreadGroups[2];
+      const matSteel = new THREE.MeshStandardMaterial({ map: TEX.steelDark, bumpMap: TEX.steelDark, bumpScale: 0.02, metalness: 0.65, roughness: 0.35 });
+      const matYellow = new THREE.MeshStandardMaterial({ map: TEX.steelGold, bumpMap: TEX.steelGold, bumpScale: 0.02, metalness: 0.45, roughness: 0.38 });
+
+      // Plataforma de hormigón y suelo patagónico
+      const ground = new THREE.Mesh(
+        new THREE.BoxGeometry(5.4, 0.2, 2.4),
+        new THREE.MeshStandardMaterial({ map: TEX.topSoil, bumpMap: TEX.topSoil, bumpScale: 0.04, roughness: 0.85 })
+      );
+      ground.position.y = 0.24;
+      g.add(ground);
+
+      // Caballete A-frame con 2 piernas tubulares inclinadas
+      const legGeom = new THREE.CylinderGeometry(0.08, 0.1, 1.4, 12);
+      const leg1 = new THREE.Mesh(legGeom, matSteel);
+      leg1.position.set(-0.45, 0.92, 0); leg1.rotation.z = -0.18;
+      const leg2 = new THREE.Mesh(legGeom, matSteel);
+      leg2.position.set(0.05, 0.92, 0); leg2.rotation.z = 0.18;
+      g.add(leg1, leg2);
+
+      // Viga balancín perfilada en "I" (alma central + alas superior e inferior) + Cabeza de caballo
+      const beamGroup = new THREE.Group();
+      beamGroup.position.set(-0.2, 1.54, 0);
+      const web = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.16, 0.08), matYellow);
+      const flangeTop = new THREE.Mesh(new THREE.BoxGeometry(2.52, 0.04, 0.24), matYellow);
+      flangeTop.position.y = 0.09;
+      const flangeBot = new THREE.Mesh(new THREE.BoxGeometry(2.52, 0.04, 0.24), matYellow);
+      flangeBot.position.y = -0.09;
+      beamGroup.add(web, flangeTop, flangeBot);
+
+      const horse = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.28, 20, 1, false, -0.3, Math.PI + 0.6), matSteel);
+      horse.position.set(1.22, -0.04, 0); horse.rotation.x = Math.PI / 2;
+      beamGroup.add(horse);
+      g.add(beamGroup);
+      s2Refs.beamGroup = beamGroup;
+
+      // Caja reductora y manivela con contrapesos gemelos
+      const gearBox = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.5, 0.5), matSteel);
+      gearBox.position.set(-1.35, 0.55, 0);
+      g.add(gearBox);
+
+      const crankGroup = new THREE.Group();
+      crankGroup.position.set(-1.35, 0.68, 0.3);
+      const weight = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.36, 0.14), matYellow);
+      weight.position.set(0.24, 0, 0);
+      crankGroup.add(weight);
+      g.add(crankGroup);
+      s2Refs.crankGroup = crankGroup;
+
+      // Camisa del pozo con brida superior (Wellhead Christmas Tree)
+      const flangeHead = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.12, 20), matSteel);
+      flangeHead.position.set(1.0, 0.38, 0);
+      g.add(flangeHead);
+
+      const casing = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.38, 0.38, 2.7, 24),
+        new THREE.MeshStandardMaterial({ color: 0xe2e8f0, transparent: true, opacity: 0.28, roughness: 0.15, metalness: 0.3, side: THREE.DoubleSide })
+      );
+      casing.position.set(1.0, -0.85, 0);
+      g.add(casing);
+
+      // Sarta de varillas pulida y pistón con anillos de sello
+      const rodPiston = new THREE.Group();
+      rodPiston.position.set(1.0, 0, 0);
+      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 2.5, 14), new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.9, roughness: 0.15 }));
+      rod.position.y = 0.2; rodPiston.add(rod);
+
+      const piston = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.3, 20), matSteel);
+      piston.position.y = -0.95; rodPiston.add(piston);
+
+      const travValve = new THREE.Mesh(new THREE.SphereGeometry(0.13, 18, 18), new THREE.MeshStandardMaterial({ color: 0x22c55e, metalness: 0.4, roughness: 0.2 }));
+      travValve.position.y = -0.8; rodPiston.add(travValve);
+      g.add(rodPiston);
+      s2Refs.rodPiston = rodPiston; s2Refs.travValve = travValve;
+
+      const standSeat = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.14, 20), matSteel);
+      standSeat.position.set(1.0, -2.02, 0); g.add(standSeat);
+      const standValve = new THREE.Mesh(new THREE.SphereGeometry(0.13, 18, 18), new THREE.MeshStandardMaterial({ color: 0xef4444, metalness: 0.4, roughness: 0.2 }));
+      standValve.position.set(1.0, -1.88, 0); g.add(standValve);
+      s2Refs.standValve = standValve;
+
+      const oilDrops = [];
+      const dropMat = new THREE.MeshStandardMaterial({ map: TEX.crudeOil, roughness: 0.15, metalness: 0.25 });
+      for (let i = 0; i < 9; i++) {
+        const d = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 14), dropMat);
+        d.position.set(1.0 + ((i % 2) - 0.5) * 0.16, -1.8 + i * 0.24, 0);
+        g.add(d); oilDrops.push(d);
+      }
+      s2Refs.oilDrops = oilDrops;
+    })();
+
+    /* ------------------------------------------------------------------
+     * ESCENA 3 TEXTURIZADA: SEPARADOR CON BRIDAS, COSTURAS Y VÁLVULAS
+     * ------------------------------------------------------------------ */
+    const s3Refs = {};
+    (function buildScene3() {
+      const g = spreadGroups[3];
+      const matSteel = new THREE.MeshStandardMaterial({ map: TEX.steelDark, metalness: 0.65, roughness: 0.35 });
+
+      // Casco horizontal transparente con anillos de refuerzo externos
+      const shell = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.1, 1.1, 4.6, 32),
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.25, roughness: 0.1, metalness: 0.3, side: THREE.DoubleSide })
+      );
+      shell.rotation.z = Math.PI / 2; g.add(shell);
+
+      // 3 Anillos metálicos de soldadura y Cunas de soporte
+      [-1.5, 0, 1.5].forEach((rx) => {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(1.12, 0.04, 12, 32), matSteel);
+        ring.rotation.y = Math.PI / 2; ring.position.x = rx;
+        g.add(ring);
+      });
+      [-1.4, 1.4].forEach((sx) => {
+        const saddle = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.5, 1.9), matSteel);
+        saddle.position.set(sx, -1.25, 0);
+        g.add(saddle);
+      });
+
+      // Tabique Vertedero (Weir) texturizado
+      const weir = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.15, 1.95), new THREE.MeshStandardMaterial({ map: TEX.steelGold, metalness: 0.5, roughness: 0.3 }));
+      weir.position.set(0.65, -0.45, 0); g.add(weir);
+
+      // Capas líquidas con texturas de salmuera y petróleo crudo
+      const waterLayer = new THREE.Mesh(
+        new THREE.BoxGeometry(2.8, 0.7, 1.85),
+        new THREE.MeshStandardMaterial({ map: TEX.brine, transparent: true, opacity: 0.88, roughness: 0.2 })
+      );
+      waterLayer.position.set(-0.78, -0.65, 0); g.add(waterLayer);
+      s3Refs.waterLayer = waterLayer;
+
+      const oilLeft = new THREE.Mesh(
+        new THREE.BoxGeometry(2.8, 0.55, 1.85),
+        new THREE.MeshStandardMaterial({ map: TEX.crudeOil, transparent: true, opacity: 0.92, roughness: 0.18, metalness: 0.2 })
+      );
+      oilLeft.position.set(-0.78, -0.05, 0); g.add(oilLeft);
+      s3Refs.oilLeft = oilLeft;
+
+      const oilRight = new THREE.Mesh(
+        new THREE.BoxGeometry(1.48, 0.85, 1.82),
+        new THREE.MeshStandardMaterial({ map: TEX.crudeOil, transparent: true, opacity: 0.94, roughness: 0.18, metalness: 0.2 })
+      );
+      oilRight.position.set(1.44, -0.55, 0); g.add(oilRight);
+      s3Refs.oilRight = oilRight;
+
+      const gasBubbles = [];
+      const gasMat = new THREE.MeshStandardMaterial({ map: TEX.gas, roughness: 0.2 });
+      for (let i = 0; i < 14; i++) {
+        const b = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 14), gasMat);
+        b.position.set(-1.9 + i * 0.28, 0.62 + (i % 3) * 0.12, ((i % 2) - 0.5) * 0.5);
+        g.add(b); gasBubbles.push(b);
+      }
+      s3Refs.gasBubbles = gasBubbles;
+    })();
+
+    /* ------------------------------------------------------------------
+     * ESCENA 4 TEXTURIZADA: TORRE DE DESTILACIÓN CON PASARELAS Y BRIDAS
+     * ------------------------------------------------------------------ */
+    const s4Refs = { trays: [], vapors: [] };
+    (function buildScene4() {
+      const g = spreadGroups[4];
+      const matSteel = new THREE.MeshStandardMaterial({ map: TEX.steelDark, metalness: 0.7, roughness: 0.3 });
+
+      g.add(new THREE.Mesh(
+        new THREE.CylinderGeometry(1.15, 1.15, 4.2, 32),
+        new THREE.MeshStandardMaterial({ color: 0xf1f5f9, transparent: true, opacity: 0.26, roughness: 0.15, metalness: 0.3, side: THREE.DoubleSide })
+      ));
+
+      // Domo metálico superior de la columna
+      const topDome = new THREE.Mesh(new THREE.SphereGeometry(1.15, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2), matSteel);
+      topDome.position.y = 2.1;
+      g.add(topDome);
+
+      // Horno refractario inferior
+      const furnace = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.18, 1.22, 0.5, 28),
+        new THREE.MeshStandardMaterial({ map: TEX.baseRock, color: 0x451a03, emissive: 0x9a3412, emissiveIntensity: 0.65, roughness: 0.6 })
+      );
+      furnace.position.y = -1.92; g.add(furnace);
+      s4Refs.furnace = furnace;
+
+      [
+        { id: 1, y: -1.05, color: 0x854d0e },
+        { id: 2, y: -0.22, color: 0xd97706 },
+        { id: 3, y:  0.62, color: 0xeab308 },
+        { id: 4, y:  1.45, color: 0x2ea89c }
+      ].forEach((tc) => {
+        // Plato perforado con textura metálica
+        const trayMesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(1.1, 1.1, 0.14, 28),
+          new THREE.MeshStandardMaterial({ map: TEX.steelGold, color: tc.color, metalness: 0.45, roughness: 0.35 })
+        );
+        trayMesh.position.y = tc.y; g.add(trayMesh);
+
+        // Tubería lateral de extracción con brida en cada nivel
+        const sidePipe = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.65, 12), matSteel);
+        sidePipe.rotation.z = Math.PI / 2;
+        sidePipe.position.set(1.35, tc.y, 0);
+        g.add(sidePipe);
+
+        // Anillo selector luminoso
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.055, 14, 36), new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xb45309 }));
+        ring.rotation.x = Math.PI / 2; ring.position.y = tc.y; ring.visible = tc.id === 1;
+        g.add(ring);
+        s4Refs.trays.push({ ...tc, ring });
+      });
+
+      for (let i = 0; i < 24; i++) {
+        const v = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), new THREE.MeshStandardMaterial({ color: 0xfef08a, emissive: 0xca8a04, emissiveIntensity: 0.4 }));
+        const ang = (i / 24) * Math.PI * 2, r = 0.25 + (i % 3) * 0.28;
+        v.position.set(Math.cos(ang) * r, -1.7 + (i / 24) * 3.4, Math.sin(ang) * r);
+        g.add(v);
+        s4Refs.vapors.push({ mesh: v, speed: 0.015 + (i % 4) * 0.004 });
+      }
+    })();
+
+    /* ------------------------------------------------------------------
+     * ESCENAS 5 Y 6: MODELOS MOLECULARES CPK BRILLANTES DE LABORATORIO
+     * ------------------------------------------------------------------ */
+    const s5Refs = { chains: [] };
+    function rebuildMoleculeScene5(type) {
+      const g = spreadGroups[5];
+      while (g.children.length > 0) g.remove(g.children[0]);
+      s5Refs.chains = [];
+      const nCarbons = type === 'c3' ? 3 : (type === 'c8' ? 8 : 16);
+      const matC = new THREE.MeshStandardMaterial({ color: 0x3f3f46, bumpMap: TEX.steelDark, bumpScale: 0.01, metalness: 0.35, roughness: 0.18 });
+      const matH = new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.15, roughness: 0.15 });
+      const matBond = new THREE.MeshStandardMaterial({ map: TEX.steelDark, metalness: 0.7, roughness: 0.25 });
+
+      [-0.75, 0.75].forEach((offsetY, chainIdx) => {
+        const chainGrp = new THREE.Group();
+        chainGrp.position.y = offsetY;
+        const stepX = nCarbons > 10 ? 0.34 : 0.46;
+        const startX = -((nCarbons - 1) * stepX) / 2;
+        for (let i = 0; i < nCarbons; i++) {
+          const cx = startX + i * stepX, cy = (i % 2 === 0 ? 0.14 : -0.14);
+          const cAtom = new THREE.Mesh(new THREE.SphereGeometry(0.21, 22, 22), matC);
+          cAtom.position.set(cx, cy, 0); chainGrp.add(cAtom);
+          if (i > 0) {
+            const prevX = startX + (i - 1) * stepX, prevY = ((i - 1) % 2 === 0 ? 0.14 : -0.14);
+            const bond = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, stepX * 1.15, 12), matBond);
+            bond.position.set((cx + prevX) / 2, (cy + prevY) / 2, 0);
+            bond.rotation.z = (i % 2 === 0) ? -0.55 : 0.55;
+            chainGrp.add(bond);
+          }
+          [-0.28, 0.28].forEach((dz) => {
+            const hAtom = new THREE.Mesh(new THREE.SphereGeometry(0.115, 16, 16), matH);
+            hAtom.position.set(cx, cy + (i % 2 === 0 ? 0.24 : -0.24), dz);
+            chainGrp.add(hAtom);
+          });
+        }
+        g.add(chainGrp);
+        s5Refs.chains.push({ grp: chainGrp, sign: chainIdx === 0 ? -1 : 1 });
+      });
+    }
+    rebuildMoleculeScene5('c3');
+
+    const s6Refs = { atoms: [] };
+    function rebuildCombustionScene6() {
+      const g = spreadGroups[6];
+      while (g.children.length > 0) g.remove(g.children[0]);
+      s6Refs.atoms = [];
+      const o2Count = BookState.s6.o2Count;
+      const matC = new THREE.MeshStandardMaterial({ color: 0x3f3f46, bumpMap: TEX.steelDark, bumpScale: 0.01, metalness: 0.35, roughness: 0.18 });
+      const matH = new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.15, roughness: 0.15 });
+      const matO = new THREE.MeshStandardMaterial({ color: 0xef4444, metalness: 0.25, roughness: 0.18 });
+
+      for (let i = 0; i < 3; i++) {
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 22, 22), matC);
+        const startPos = new THREE.Vector3(-2.1 + (i - 1) * 0.45, 0.6 + (i % 2) * 0.22, 0);
+        const endPos = new THREE.Vector3(1.55, 1.0 - i * 0.95, 0);
+        mesh.position.copy(BookState.s6.reacted ? endPos : startPos);
+        g.add(mesh); s6Refs.atoms.push({ mesh, startPos, endPos });
+      }
+      for (let i = 0; i < 8; i++) {
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), matH);
+        const angle = (i / 8) * Math.PI * 2;
+        const startPos = new THREE.Vector3(-2.1 + Math.cos(angle) * 0.72, 0.68 + Math.sin(angle) * 0.48, (i % 2 - 0.5) * 0.3);
+        const h2oIdx = Math.floor(i / 2), side = (i % 2 === 0) ? -0.24 : 0.24;
+        const endPos = new THREE.Vector3(-0.35 + side, 1.25 - h2oIdx * 0.82, 0.2);
+        mesh.position.copy(BookState.s6.reacted ? endPos : startPos);
+        g.add(mesh); s6Refs.atoms.push({ mesh, startPos, endPos });
+      }
+      const totalO = o2Count * 2;
+      for (let i = 0; i < totalO; i++) {
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.2, 20, 20), matO);
+        const molIdx = Math.floor(i / 2), pairOffset = (i % 2 === 0) ? -0.19 : 0.19;
+        const row = Math.floor(molIdx / 3), col = molIdx % 3;
+        const startPos = new THREE.Vector3(-2.3 + col * 0.85 + pairOffset, -0.55 - row * 0.68, 0);
+        let endPos;
+        if (i < 4) endPos = new THREE.Vector3(-0.35, 1.25 - i * 0.82, 0);
+        else if (i < 10) {
+          const cIdx = Math.floor((i - 4) / 2), oSide = ((i - 4) % 2 === 0) ? -0.34 : 0.34;
+          endPos = new THREE.Vector3(1.55 + oSide, 1.0 - cIdx * 0.95, 0);
+        } else endPos = new THREE.Vector3(2.45 + pairOffset, -1.25, (i - 10) * 0.25);
+        mesh.position.copy(BookState.s6.reacted ? endPos : startPos);
+        g.add(mesh); s6Refs.atoms.push({ mesh, startPos, endPos });
+      }
+    }
+    rebuildCombustionScene6();
+
+    /********************************************************************
+     * 5. NAVEGACIÓN Y ACTUALIZACIÓN DE CONTROLES
+     ********************************************************************/
+    const viewCover = document.getElementById('view-cover');
+    const viewSpread = document.getElementById('view-spread');
+    const turningLeaf = document.getElementById('turning-leaf');
+    const topTitle = document.getElementById('top-title');
+
+    function triggerPageFlip(dir) {
+      turningLeaf.classList.remove('flip-next', 'flip-prev');
+      void turningLeaf.offsetWidth;
+      turningLeaf.classList.add(dir >= 0 ? 'flip-next' : 'flip-prev');
+    }
+
+    function goToSpread(targetIndex) {
+      stopNarration();
+      const prev = BookState.currentSpread;
+      const next = Math.max(0, Math.min(6, targetIndex));
+      if (next !== prev && prev > 0 && next > 0) {
+        triggerPageFlip(next > prev ? 1 : -1);
+      }
+      BookState.currentSpread = next;
+
+      for (let i = 1; i <= 6; i++) spreadGroups[i].visible = (i === next);
+
+      if (next === 0) {
+        viewCover.classList.remove('hidden');
+        viewSpread.classList.add('hidden');
+        topTitle.textContent = 'Portada · Del Subsuelo al Motor';
+        applyBookRigTransform();
+        return;
+      }
+
+      viewCover.classList.add('hidden');
+      viewSpread.classList.remove('hidden');
+
+      const data = SPREADS_DATA[next];
+      topTitle.textContent = data.kicker;
+      document.getElementById('sp-kicker').textContent = data.kicker;
+      document.getElementById('sp-title').textContent = data.title;
+      document.getElementById('sp-body').textContent = data.bodyText;
+      document.getElementById('sp-keybox').innerHTML = data.keyBoxHtml;
+      document.getElementById('sp-note').innerHTML = data.noteHtml;
+      document.getElementById('chal-desc').textContent = data.challengeDesc;
+
+      document.getElementById('folio-left').textContent = `Página ${next * 2}`;
+      document.getElementById('folio-right').textContent = `Página ${next * 2 + 1}`;
+      document.getElementById('btn-turn-prev').textContent = next === 1 ? '← Volver a Portada' : '← Hoja anterior';
+      document.getElementById('btn-turn-next').style.visibility = next < 6 ? 'visible' : 'hidden';
+
+      renderPredictionBlock(next, data);
+      renderDynamicControls(next);
+      applyBookRigTransform();
+
+      orbit.theta = 0.24; orbit.phi = 1.12; orbit.radius = 7.8;
+      applyOrbit();
+      requestAnimationFrame(onResizeThree);
+
+      if (!BookState.muted) {
+        setTimeout(() => startNarration(next), 520);
+      }
+    }
+
+    function renderPredictionBlock(spreadIdx, data) {
+      const qEl = document.getElementById('pred-q');
+      const optsEl = document.getElementById('pred-opts');
+      const flapEl = document.getElementById('pred-flap');
+      const badgeEl = document.getElementById('pred-badge');
+
+      qEl.textContent = data.predictQ;
+      optsEl.innerHTML = '';
+      const saved = BookState.predictions[spreadIdx];
+
+      data.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = 'pred-opt';
+        btn.textContent = opt.text;
+        if (saved === opt.id) btn.classList.add(opt.ok ? 'selected-ok' : 'selected-err');
+        btn.addEventListener('click', () => {
+          BookState.predictions[spreadIdx] = opt.id;
+          renderPredictionBlock(spreadIdx, data);
+        });
+        optsEl.appendChild(btn);
+      });
+
+      if (saved) {
+        const chosen = data.options.find((o) => o.id === saved);
+        flapEl.innerHTML = chosen.exp;
+        flapEl.classList.add('open');
+        badgeEl.textContent = chosen.ok ? '✓ Predicción correcta' : '↺ Revisa la explicación';
+        badgeEl.style.color = chosen.ok ? 'var(--ok-green)' : 'var(--err-red)';
+      } else {
+        flapEl.classList.remove('open');
+        flapEl.innerHTML = '';
+        badgeEl.textContent = 'Sin responder';
+        badgeEl.style.color = '#6b5310';
+      }
+    }
+
+    function renderDynamicControls(spreadIdx) {
+      const box = document.getElementById('dynamic-controls');
+      const readout = document.getElementById('sp-readout');
+      const chalStatus = document.getElementById('chal-status');
+      const ctrlTag = document.getElementById('ctrl-tag');
+      box.innerHTML = '';
+      chalStatus.className = 'challenge-status';
+
+      if (spreadIdx === 1) {
+        ctrlTag.textContent = BookState.s1.poreMode ? 'Vista: Poros (4.000×)' : 'Vista: Domo Anticlinal';
+        box.innerHTML = `
+          <div class="ctrl-row">
+            <label>«Corte del estrato»:</label>
+            <input type="range" id="ctrl-slice" min="0" max="100" value="${BookState.s1.slice}" />
+            <span class="ctrl-val" id="val-slice">${BookState.s1.slice} %</span>
+          </div>
+          <div class="ctrl-row">
+            <label>«Posición de la torre»:</label>
+            <input type="range" id="ctrl-rig" min="-400" max="400" step="10" value="${BookState.s1.rigX}" />
+            <span class="ctrl-val" id="val-rig">${BookState.s1.rigX} m</span>
+          </div>
+          <div class="ctrl-btns">
+            <button class="act-btn ${BookState.s1.poreMode ? 'active-toggle' : ''}" id="btn-pore">🔍 «Zoom a los poros»</button>
+            <button class="act-btn primary" id="btn-drill">⛏️ «Perforar pozo»</button>
+          </div>
+        `;
+        setSpreadLabels([
+          { text: 'Roca sello (lutita)', pos: new THREE.Vector3(-1.3, 1.0, 0.85), visibleFn: () => !BookState.s1.poreMode },
+          { text: 'Casquete de gas', pos: new THREE.Vector3(0, 0.7, 0.85), visibleFn: () => !BookState.s1.poreMode && BookState.s1.slice >= 40 },
+          { text: 'Petróleo crudo', pos: new THREE.Vector3(1.05, 0.3, 0.85), visibleFn: () => !BookState.s1.poreMode && BookState.s1.slice >= 40 },
+          { text: 'Salmuera (agua)', pos: new THREE.Vector3(1.9, -0.35, 0.85), visibleFn: () => !BookState.s1.poreMode && BookState.s1.slice >= 40 },
+          { text: 'Grano de arenisca', pos: new THREE.Vector3(-0.9, 0.82, 0.2), visibleFn: () => BookState.s1.poreMode },
+          { text: 'Crudo en poro (22%)', pos: new THREE.Vector3(0.2, 0, 0.5), visibleFn: () => BookState.s1.poreMode }
+        ]);
+        const syncS1 = () => {
+          s1Refs.curtain.position.x = -(BookState.s1.slice / 100) * 5.2;
+          s1Refs.curtain.visible = BookState.s1.slice < 96;
+          if (BookState.s1.slice >= 50) BookState.s1.inspected = true;
+          s1Refs.rig.position.x = (BookState.s1.rigX / 400) * 2.25;
+          s1Refs.macro.visible = !BookState.s1.poreMode;
+          s1Refs.pore.visible = BookState.s1.poreMode;
+        };
+        syncS1();
+        readout.textContent = `Torre en x = ${BookState.s1.rigX} m · Corte al ${BookState.s1.slice} %. Abre el corte (> 50 %) y perfora en la franja de crudo (100 a 240 m).`;
+        chalStatus.textContent = BookState.completed[1] ? '✓ ¡Desafío completado con éxito!' : 'En espera: Abre el corte y perfora en el flanco petrolífero.';
+        if (BookState.completed[1]) chalStatus.classList.add('ok');
+
+        document.getElementById('ctrl-slice').addEventListener('input', (e) => {
+          BookState.s1.slice = Number(e.target.value);
+          document.getElementById('val-slice').textContent = `${BookState.s1.slice} %`;
+          syncS1();
+        });
+        document.getElementById('ctrl-rig').addEventListener('input', (e) => {
+          BookState.s1.rigX = Number(e.target.value);
+          document.getElementById('val-rig').textContent = `${BookState.s1.rigX} m`;
+          BookState.s1.drilling = false;
+          s1Refs.pipe.scale.y = 0.01;
+          syncS1();
+        });
+        document.getElementById('btn-pore').addEventListener('click', () => {
+          BookState.s1.poreMode = !BookState.s1.poreMode;
+          BookState.s1.inspected = true;
+          renderDynamicControls(1);
+        });
+        document.getElementById('btn-drill').addEventListener('click', () => {
+          BookState.s1.poreMode = false; syncS1();
+          const ax = Math.abs(BookState.s1.rigX);
+          const sx = (BookState.s1.rigX / 400) * 2.25;
+          BookState.s1.targetDepth = 1.5 - (s1Refs.archY(sx) - 0.18);
+          BookState.s1.drillProgress = 0.05; BookState.s1.drilling = true;
+          if (ax <= 90) {
+            readout.textContent = `x = ${BookState.s1.rigX} m: ¡Pinchaste el casquete de gas! Pierdes presión.`;
+            chalStatus.textContent = '✗ Perforaste la cima de gas. Mueve la torre a 100–240 m.';
+            chalStatus.className = 'challenge-status err';
+          } else if (ax >= 100 && ax <= 240) {
+            if (!BookState.s1.inspected) {
+              chalStatus.textContent = '⚠ Abre primero el «Corte del estrato» (> 50 %) para validar.';
+            } else {
+              readout.textContent = `¡ÉXITO en x = ${BookState.s1.rigX} m! Extraes petróleo crudo (ρ = 0,84 g/cm³).`;
+              chalStatus.textContent = '✓ ¡Desafío completado con éxito!';
+              chalStatus.className = 'challenge-status ok';
+              markSpreadSolved(1);
+            }
+          } else {
+            readout.textContent = `x = ${BookState.s1.rigX} m: Pozo inundado de agua salada (ρ = 1,07 g/cm³).`;
+            chalStatus.textContent = '✗ Perforaste en la zona de salmuera.';
+            chalStatus.className = 'challenge-status err';
+          }
+        });
+      }
+
+      else if (spreadIdx === 2) {
+        ctrlTag.textContent = 'Bombeo Mecánico ENAP';
+        box.innerHTML = `
+          <div class="ctrl-row">
+            <label>«Velocidad de bombeo»:</label>
+            <input type="range" id="ctrl-spm" min="0" max="18" step="1" value="${BookState.s2.spm}" />
+            <span class="ctrl-val" id="val-spm">${BookState.s2.spm} SPM</span>
+          </div>
+          <div class="ctrl-row">
+            <label>«Presión en cabeza»:</label>
+            <input type="range" id="ctrl-whp" min="4" max="26" step="1" value="${BookState.s2.whp}" />
+            <span class="ctrl-val" id="val-whp">${BookState.s2.whp} bar</span>
+          </div>
+        `;
+        setSpreadLabels([
+          { text: 'Balancín («cigüeña»)', pos: new THREE.Vector3(-0.2, 1.85, 0) },
+          { text: 'Contrapeso', pos: new THREE.Vector3(-1.35, 0.25, 0.2) },
+          { text: 'Válvula viajera (pistón)', pos: new THREE.Vector3(1.0, -0.8, 0.4) },
+          { text: 'Válvula fija (fondo)', pos: new THREE.Vector3(1.0, -1.95, 0.4) }
+        ]);
+        const evalS2 = () => {
+          const { spm, whp } = BookState.s2;
+          const flow = Math.round(spm * 14.5);
+          if (spm >= 8 && spm <= 12 && whp >= 12 && whp <= 18) {
+            readout.textContent = `Régimen óptimo: ${spm} SPM | ${whp} bar → Caudal estable: ${flow} barriles/día.`;
+            chalStatus.textContent = '✓ ¡Desafío completado con éxito!';
+            chalStatus.className = 'challenge-status ok';
+            markSpreadSolved(2);
+          } else if (spm > 12) {
+            readout.textContent = `¡Alerta (${spm} SPM)! Exceso de velocidad genera bloqueo por gas (cavitación).`;
+            chalStatus.textContent = '✗ Cavitación en bomba. Reduce a 8–12 SPM.';
+            chalStatus.className = 'challenge-status err';
+          } else {
+            readout.textContent = `Actual: ${spm} SPM y ${whp} bar (${flow} bpd). Meta: 8–12 SPM y 12–18 bar.`;
+            chalStatus.textContent = 'En espera: Calibra ambos controles dentro del rango.';
+          }
+        };
+        evalS2();
+        document.getElementById('ctrl-spm').addEventListener('input', (e) => {
+          BookState.s2.spm = Number(e.target.value);
+          document.getElementById('val-spm').textContent = `${BookState.s2.spm} SPM`;
+          evalS2();
+        });
+        document.getElementById('ctrl-whp').addEventListener('input', (e) => {
+          BookState.s2.whp = Number(e.target.value);
+          document.getElementById('val-whp').textContent = `${BookState.s2.whp} bar`;
+          evalS2();
+        });
+      }
+
+      else if (spreadIdx === 3) {
+        ctrlTag.textContent = 'Decantación Trifásica';
+        box.innerHTML = `
+          <div class="ctrl-row">
+            <label>«Válvula drenaje agua»:</label>
+            <input type="range" id="ctrl-water-valve" min="0" max="100" step="5" value="${BookState.s3.waterValve}" />
+            <span class="ctrl-val" id="val-wv">${BookState.s3.waterValve} %</span>
+          </div>
+          <div class="ctrl-row">
+            <label>«Tiempo de residencia»:</label>
+            <input type="range" id="ctrl-residence" min="1" max="10" step="1" value="${BookState.s3.residence}" />
+            <span class="ctrl-val" id="val-res">${BookState.s3.residence} min</span>
+          </div>
+        `;
+        setSpreadLabels([
+          { text: 'Gas natural (ρ=0,18)', pos: new THREE.Vector3(-0.2, 0.85, 0.5) },
+          { text: 'Petróleo crudo (ρ=0,84)', pos: new THREE.Vector3(-0.6, 0.05, 0.6) },
+          { text: 'Salmuera (ρ=1,07)', pos: new THREE.Vector3(-0.8, -0.75, 0.6) },
+          { text: 'Vertedero (weir)', pos: new THREE.Vector3(0.65, -0.35, 0.7) },
+          { text: 'Crudo limpio', pos: new THREE.Vector3(1.5, -0.5, 0.6) }
+        ]);
+        const evalS3 = () => {
+          const { waterValve, residence } = BookState.s3;
+          const waterH = Math.max(0.25, Math.min(1.15, 1.05 - (waterValve / 100) * 0.8));
+          s3Refs.waterLayer.scale.y = waterH / 0.7;
+          s3Refs.waterLayer.position.y = -1.0 + waterH / 2;
+          s3Refs.oilLeft.position.y = s3Refs.waterLayer.position.y + waterH / 2 + 0.26;
+          if (waterValve >= 45 && waterValve <= 65 && residence >= 6) {
+            s3Refs.oilRight.material.color.setHex(0xffffff);
+            readout.textContent = `Equilibrio logrado: Drenaje al ${waterValve} % | Residencia ${residence} min → Crudo 99,2 % limpio.`;
+            chalStatus.textContent = '✓ ¡Desafío completado con éxito!';
+            chalStatus.className = 'challenge-status ok';
+            markSpreadSolved(3);
+          } else if (waterValve < 45) {
+            s3Refs.oilRight.material.color.setHex(0x3b82f6);
+            readout.textContent = `Drenaje muy cerrado (${waterValve} %): El agua salada rebalsa el vertedero hacia el crudo.`;
+            chalStatus.textContent = '✗ Agua rebalsando al petróleo. Abre drenaje (45–65 %).';
+            chalStatus.className = 'challenge-status err';
+          } else if (waterValve > 65) {
+            readout.textContent = `Drenaje muy abierto (${waterValve} %): Se escapa petróleo por el desagüe de agua.`;
+            chalStatus.textContent = '✗ Fuga de crudo por el fondo. Regula entre 45 % y 65 %.';
+            chalStatus.className = 'challenge-status err';
+          } else {
+            readout.textContent = `Residencia baja (${residence} min): Sube a ≥ 6 min para decantar.`;
+            chalStatus.textContent = '⚠ Sube el Tiempo de residencia a ≥ 6 min.';
+          }
+        };
+        evalS3();
+        document.getElementById('ctrl-water-valve').addEventListener('input', (e) => {
+          BookState.s3.waterValve = Number(e.target.value);
+          document.getElementById('val-wv').textContent = `${BookState.s3.waterValve} %`;
+          evalS3();
+        });
+        document.getElementById('ctrl-residence').addEventListener('input', (e) => {
+          BookState.s3.residence = Number(e.target.value);
+          document.getElementById('val-res').textContent = `${BookState.s3.residence} min`;
+          evalS3();
+        });
+      }
+
+      else if (spreadIdx === 4) {
+        ctrlTag.textContent = 'Torre Atmosférica';
+        box.innerHTML = `
+          <div class="ctrl-row">
+            <label>«Temperatura del horno»:</label>
+            <input type="range" id="ctrl-furnace" min="200" max="400" step="10" value="${BookState.s4.furnaceTemp}" />
+            <span class="ctrl-val" id="val-fur">${BookState.s4.furnaceTemp} °C</span>
+          </div>
+          <div class="ctrl-btns" id="tray-btns">
+            <button class="act-btn ${BookState.s4.selectedTray===4?'active-toggle':''}" data-tray="4">Plato 4 (&lt;40°C)</button>
+            <button class="act-btn ${BookState.s4.selectedTray===3?'active-toggle':''}" data-tray="3">Plato 3 (110°C)</button>
+            <button class="act-btn ${BookState.s4.selectedTray===2?'active-toggle':''}" data-tray="2">Plato 2 (210°C)</button>
+            <button class="act-btn ${BookState.s4.selectedTray===1?'active-toggle':''}" data-tray="1">Plato 1 (290°C)</button>
+          </div>
+        `;
+        setSpreadLabels([
+          { text: 'GLP C₃–C₄ (<40 °C)', pos: new THREE.Vector3(0, 1.55, 0.9) },
+          { text: 'Gasolina C₅–C₁₀ (110 °C)', pos: new THREE.Vector3(0, 0.68, 0.9) },
+          { text: 'Kerosene C₁₁–C₁₄ (210 °C)', pos: new THREE.Vector3(0, -0.18, 0.9) },
+          { text: 'Diésel C₁₅–C₂₀ (290 °C)', pos: new THREE.Vector3(0, -1.0, 0.9) },
+          { text: 'Horno + Asfalto', pos: new THREE.Vector3(0, -1.92, 0.9) }
+        ]);
+        const evalS4 = () => {
+          const { furnaceTemp, selectedTray } = BookState.s4;
+          s4Refs.trays.forEach((t) => { t.ring.visible = (t.id === selectedTray); });
+          s4Refs.furnace.material.emissiveIntensity = (furnaceTemp - 180) / 220;
+          const names = {
+            1: 'Plato 1 (290 °C): Diésel (C₁₅–C₂₀).',
+            2: 'Plato 2 (210 °C): Kerosene Jet A-1 (C₁₁–C₁₄, ebullición 180–250 °C).',
+            3: 'Plato 3 (110 °C): Gasolina automotriz (C₅–C₁₀).',
+            4: 'Plato 4 (< 40 °C): Gas Licuado (GLP, C₃–C₄).'
+          };
+          readout.textContent = `Horno: ${furnaceTemp} °C | ${names[selectedTray]}`;
+          if (selectedTray === 2 && furnaceTemp >= 370) {
+            chalStatus.textContent = '✓ ¡Desafío completado con éxito! Kerosene Jet A-1 extraído.';
+            chalStatus.className = 'challenge-status ok';
+            markSpreadSolved(4);
+          } else {
+            chalStatus.textContent = 'En espera: Sube horno a ≥ 370 °C y elige el plato del Kerosene (210 °C).';
+          }
+        };
+        evalS4();
+        document.getElementById('ctrl-furnace').addEventListener('input', (e) => {
+          BookState.s4.furnaceTemp = Number(e.target.value);
+          document.getElementById('val-fur').textContent = `${BookState.s4.furnaceTemp} °C`;
+          evalS4();
+        });
+        document.querySelectorAll('#tray-btns .act-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            BookState.s4.selectedTray = Number(btn.dataset.tray);
+            renderDynamicControls(4);
+          });
+        });
+      }
+
+      else if (spreadIdx === 5) {
+        ctrlTag.textContent = 'Fuerzas Intermoleculares';
+        box.innerHTML = `
+          <div class="ctrl-btns" id="mol-btns">
+            <button class="act-btn ${BookState.s5.molType==='c3'?'active-toggle':''}" data-mol="c3">Propano (C₃H₈)</button>
+            <button class="act-btn ${BookState.s5.molType==='c8'?'active-toggle':''}" data-mol="c8">Octano / Bencina (C₈H₁₈)</button>
+            <button class="act-btn ${BookState.s5.molType==='c16'?'active-toggle':''}" data-mol="c16">Diésel (C₁₆H₃₄)</button>
+          </div>
+          <div class="ctrl-row">
+            <label>«Temperatura de prueba»:</label>
+            <input type="range" id="ctrl-mol-temp" min="-60" max="320" step="10" value="${BookState.s5.temp}" />
+            <span class="ctrl-val" id="val-mtemp">${BookState.s5.temp} °C</span>
+          </div>
+        `;
+        const bpMap = { c3: -42, c8: 125, c16: 287 };
+        setSpreadLabels([
+          { text: 'Cadena hidrocarbonada #1', pos: new THREE.Vector3(0, 1.15, 0) },
+          { text: 'Atracción de London', pos: new THREE.Vector3(0, 0, 0) },
+          { text: 'Cadena hidrocarbonada #2', pos: new THREE.Vector3(0, -1.15, 0) }
+        ]);
+        const evalS5 = () => {
+          const { molType, temp, visited } = BookState.s5;
+          const bp = bpMap[molType];
+          readout.textContent = `Ebullición: ${bp} °C | A ${temp} °C está en: ${temp >= bp ? 'FASE GAS (cadenas sueltas)' : 'FASE LÍQUIDA (cohesionadas)'}.`;
+          const allV = visited.c3 && visited.c8 && visited.c16;
+          if (allV && molType === 'c8' && temp === 150) {
+            chalStatus.textContent = '✓ ¡Desafío completado con éxito!';
+            chalStatus.className = 'challenge-status ok';
+            markSpreadSolved(5);
+          } else {
+            chalStatus.textContent = `Revisa las 3 cadenas (${Object.values(visited).filter(Boolean).length}/3) y pon Octano a 150 °C.`;
+          }
+        };
+        evalS5();
+        document.querySelectorAll('#mol-btns .act-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const m = btn.dataset.mol;
+            BookState.s5.molType = m; BookState.s5.visited[m] = true;
+            rebuildMoleculeScene5(m); renderDynamicControls(5);
+          });
+        });
+        document.getElementById('ctrl-mol-temp').addEventListener('input', (e) => {
+          BookState.s5.temp = Number(e.target.value);
+          document.getElementById('val-mtemp').textContent = `${BookState.s5.temp} °C`;
+          evalS5();
+        });
+      }
+
+      else if (spreadIdx === 6) {
+        ctrlTag.textContent = 'Conservación de Masa (OA 18)';
+        box.innerHTML = `
+          <div class="ctrl-row">
+            <label>«Moléculas de O₂»:</label>
+            <input type="range" id="ctrl-o2" min="2" max="7" step="1" value="${BookState.s6.o2Count}" />
+            <span class="ctrl-val" id="val-o2">${BookState.s6.o2Count} O₂ (${BookState.s6.o2Count * 2} O)</span>
+          </div>
+          <div class="ctrl-btns">
+            <button class="act-btn primary" id="btn-spark">⚡ «Accionar chispa»</button>
+            <button class="act-btn" id="btn-reset-chem">↺ Reiniciar</button>
+          </div>
+        `;
+        setSpreadLabels([
+          { text: 'Reactivo: 1 C₃H₈ (3C + 8H)', pos: new THREE.Vector3(-2.1, 1.25, 0), visibleFn: () => !BookState.s6.reacted },
+          { text: `Reactivo: ${BookState.s6.o2Count} O₂`, pos: new THREE.Vector3(-1.5, -1.35, 0), visibleFn: () => !BookState.s6.reacted },
+          { text: 'Producto: 4 H₂O', pos: new THREE.Vector3(-0.35, 1.65, 0), visibleFn: () => BookState.s6.reacted },
+          { text: 'Producto: 3 CO₂', pos: new THREE.Vector3(1.55, 1.5, 0), visibleFn: () => BookState.s6.reacted }
+        ]);
+        const evalS6 = () => {
+          const o2 = BookState.s6.o2Count;
+          if (!BookState.s6.reacted) {
+            readout.textContent = `Reactivos: 1 C₃H₈ + ${o2} O₂ (${o2*2} átomos O). Presiona «⚡ Accionar chispa».`;
+          } else if (o2 === 5) {
+            readout.textContent = `¡COMBUSTIÓN COMPLETA! 1 C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O (Masa conservada).`;
+            chalStatus.textContent = '✓ ¡Desafío final completado con éxito!';
+            chalStatus.className = 'challenge-status ok';
+            markSpreadSolved(6);
+          } else if (o2 < 5) {
+            readout.textContent = `Combustión INCOMPLETA (${o2} O₂): Falta oxígeno, se produce CO y hollín.`;
+            chalStatus.textContent = '✗ Falta oxígeno. Ajusta a 5 O₂.';
+            chalStatus.className = 'challenge-status err';
+          } else {
+            readout.textContent = `Exceso de oxígeno (${o2} O₂): Sobran moléculas sin reaccionar.`;
+            chalStatus.textContent = '⚠ Ajusta exactamente a 5 O₂.';
+          }
+        };
+        evalS6();
+        document.getElementById('ctrl-o2').addEventListener('input', (e) => {
+          BookState.s6.o2Count = Number(e.target.value);
+          BookState.s6.reacted = false; BookState.s6.animProgress = 0;
+          document.getElementById('val-o2').textContent = `${BookState.s6.o2Count} O₂ (${BookState.s6.o2Count * 2} O)`;
+          rebuildCombustionScene6(); renderDynamicControls(6);
+        });
+        document.getElementById('btn-spark').addEventListener('click', () => {
+          BookState.s6.reacted = true; BookState.s6.animProgress = 0; evalS6();
+        });
+        document.getElementById('btn-reset-chem').addEventListener('click', () => {
+          BookState.s6.reacted = false; BookState.s6.animProgress = 0;
+          rebuildCombustionScene6(); evalS6();
+        });
+      }
+    }
+
+    /********************************************************************
+     * 6. BUCLE DE ANIMACIÓN Y RESIZE RESPONSIVO
+     ********************************************************************/
+    function onResizeThree() {
+      applyBookRigTransform();
+      const w = stageSpace.clientWidth;
+      const h = stageSpace.clientHeight;
+      if (w === 0 || h === 0) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    window.addEventListener('resize', onResizeThree);
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const sp = BookState.currentSpread;
+      if (sp === 0) return;
+      const t = clock.getElapsedTime();
+
+      if (sp === 1) {
+        if (BookState.s1.drilling && BookState.s1.drillProgress < BookState.s1.targetDepth) {
+          BookState.s1.drillProgress = Math.min(BookState.s1.targetDepth, BookState.s1.drillProgress + 0.04);
+          s1Refs.pipe.scale.y = BookState.s1.drillProgress;
+        }
+        if (BookState.s1.poreMode) {
+          s1Refs.drops.forEach((d) => { d.mesh.position.y = d.by + Math.sin(t * 3 + d.ph) * 0.03; });
+        }
+      } else if (sp === 2 && BookState.s2.spm > 0) {
+        const phase = t * (BookState.s2.spm / 10) * 2.6;
+        const sinP = Math.sin(phase), upstroke = Math.cos(phase) >= 0;
+        s2Refs.beamGroup.rotation.z = sinP * 0.22;
+        s2Refs.crankGroup.rotation.z = phase;
+        s2Refs.rodPiston.position.y = sinP * 0.35;
+        s2Refs.travValve.material.color.setHex(upstroke ? 0xef4444 : 0x22c55e);
+        s2Refs.standValve.material.color.setHex(upstroke ? 0x22c55e : 0xef4444);
+        if (upstroke) {
+          s2Refs.oilDrops.forEach((d) => {
+            d.position.y += 0.012 * (BookState.s2.spm / 8);
+            if (d.position.y > 0.2) d.position.y = -1.85;
+          });
+        }
+      } else if (sp === 3) {
+        s3Refs.gasBubbles.forEach((b, i) => {
+          b.position.x += 0.012;
+          b.position.y = 0.65 + Math.sin(t * 3 + i) * 0.08;
+          if (b.position.x > 1.8) b.position.x = -1.9;
+        });
+      } else if (sp === 4) {
+        const maxH = -1.7 + ((BookState.s4.furnaceTemp - 180) / 220) * 3.4;
+        s4Refs.vapors.forEach((v) => {
+          v.mesh.position.y += v.speed;
+          if (v.mesh.position.y > maxH) v.mesh.position.y = -1.75;
+        });
+      } else if (sp === 5) {
+        const bp = { c3: -42, c8: 125, c16: 287 }[BookState.s5.molType];
+        const sep = BookState.s5.temp >= bp ? 1.35 : 0.62;
+        const vib = Math.max(0.01, (BookState.s5.temp + 80) / 400) * 0.12;
+        s5Refs.chains.forEach((ch, idx) => {
+          ch.grp.position.y = ch.sign * sep + Math.sin(t * 6 + idx * 2) * vib;
+          ch.grp.rotation.z = Math.cos(t * 4 + idx) * (vib * 0.4);
+        });
+      } else if (sp === 6 && BookState.s6.reacted && BookState.s6.animProgress < 1) {
+        BookState.s6.animProgress = Math.min(1, BookState.s6.animProgress + 0.03);
+        s6Refs.atoms.forEach((a) => a.mesh.position.lerpVectors(a.startPos, a.endPos, BookState.s6.animProgress));
+      }
+
+      renderer.render(scene, camera);
+      updateLabels2D();
+    }
+    animate();
+
+    /********************************************************************
+     * 7. SELECTOR DE VOZ NATURAL CHILENA / LATINA
+     ********************************************************************/
+    const btnTts = document.getElementById('btn-tts');
+    const btnMute = document.getElementById('btn-mute');
+    const voiceSelect = document.getElementById('voice-select');
+    const guideCursor = document.getElementById('guide-cursor');
+    let cueTimers = [];
+    let isSpeaking = false;
+    let spanishVoices = [];
+
+    function scoreSpanishVoice(v) {
+      let score = 0;
+      const name = v.name.toLowerCase();
+      const lang = (v.lang || '').toLowerCase();
+      if (name.includes('natural') || name.includes('online') || name.includes('neural')) score += 60;
+      if (name.includes('google')) score += 35;
+      if (lang === 'es-cl' || name.includes('chile') || name.includes('lorenzo') || name.includes('catalina')) score += 50;
+      else if (lang === 'es-mx' || lang === 'es-us' || lang === 'es-419' || lang === 'es-ar' || lang === 'es-co') score += 25;
+      else if (lang.startsWith('es')) score += 10;
+      if (name.includes('sabina') && !name.includes('natural')) score -= 15;
+      if (name.includes('helena') && !name.includes('natural')) score -= 15;
+      return score;
+    }
+
+    function populateVoices() {
+      if (!('speechSynthesis' in window)) return;
+      const all = window.speechSynthesis.getVoices();
+      spanishVoices = all
+        .filter((v) => v.lang && v.lang.toLowerCase().startsWith('es'))
+        .sort((a, b) => scoreSpanishVoice(b) - scoreSpanishVoice(a));
+
+      voiceSelect.innerHTML = '';
+      if (spanishVoices.length === 0) {
+        const opt = document.createElement('option');
+        opt.textContent = 'Voz del sistema (es-CL)';
+        voiceSelect.appendChild(opt);
+        return;
+      }
+      spanishVoices.forEach((v, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        const tag = v.name.replace(/Microsoft |Google /g, '');
+        opt.textContent = `🎙️ ${tag} (${v.lang})`;
+        voiceSelect.appendChild(opt);
+      });
+    }
+
+    if ('speechSynthesis' in window) {
+      populateVoices();
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    function clearCues() {
+      cueTimers.forEach((id) => clearTimeout(id));
+      cueTimers = [];
+      guideCursor.classList.remove('on');
+      document.querySelectorAll('.sim-press').forEach((el) => el.classList.remove('sim-press'));
+    }
+
+    function moveGuideTo(selector) {
+      const el = document.querySelector(selector);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      guideCursor.classList.add('on');
+      guideCursor.style.left = `${r.left + r.width / 2}px`;
+      guideCursor.style.top = `${r.top + r.height / 2}px`;
+      el.classList.add('sim-press');
+      setTimeout(() => el.classList.remove('sim-press'), 900);
+    }
+
+    function stopNarration() {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      isSpeaking = false;
+      btnTts.textContent = '▶ Escuchar';
+      btnTts.classList.remove('active');
+      clearCues();
+    }
+
+    function startNarration(spreadIdx) {
+      stopNarration();
+      const data = SPREADS_DATA[spreadIdx];
+      if (!data || !('speechSynthesis' in window)) return;
+
+      const utter = new SpeechSynthesisUtterance(data.narrationText);
+      const chosenVoice = spanishVoices[Number(voiceSelect.value)] || spanishVoices[0];
+      if (chosenVoice) {
+        utter.voice = chosenVoice;
+        utter.lang = chosenVoice.lang;
+      } else {
+        utter.lang = 'es-CL';
+      }
+      utter.rate = 0.97;
+      utter.pitch = 1.02;
+
+      utter.onstart = () => {
+        isSpeaking = true;
+        btnTts.textContent = '⏹ Detener';
+        btnTts.classList.add('active');
+        (data.cues || []).forEach((c) => {
+          cueTimers.push(setTimeout(() => moveGuideTo(c.selector), c.timeMs));
+        });
+      };
+      utter.onend = () => stopNarration();
+      utter.onerror = () => stopNarration();
+      window.speechSynthesis.speak(utter);
+    }
+
+    btnTts.addEventListener('click', () => {
+      if (isSpeaking) stopNarration();
+      else {
+        if (BookState.currentSpread === 0) goToSpread(1);
+        else startNarration(BookState.currentSpread);
+      }
+    });
+
+    function syncMuteBtn() {
+      btnMute.textContent = BookState.muted ? '🔇 Voz silenciada' : '🔊 Voz activa';
+      btnMute.classList.toggle('active', !BookState.muted);
+    }
+    syncMuteBtn();
+
+    btnMute.addEventListener('click', () => {
+      BookState.muted = !BookState.muted;
+      localStorage.setItem('lsfb_petroleo_v4_muted', String(BookState.muted));
+      syncMuteBtn();
+      if (BookState.muted) stopNarration();
+    });
+
+    document.getElementById('btn-open-book').addEventListener('click', () => goToSpread(1));
+    document.getElementById('btn-turn-prev').addEventListener('click', () => goToSpread(BookState.currentSpread - 1));
+    document.getElementById('btn-turn-next').addEventListener('click', () => goToSpread(BookState.currentSpread + 1));
+    document.querySelectorAll('[data-goto]').forEach((el) => {
+      el.addEventListener('click', () => goToSpread(Number(el.dataset.goto)));
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' && BookState.currentSpread < 6) goToSpread(BookState.currentSpread + 1);
+      if (e.key === 'ArrowLeft' && BookState.currentSpread > 0) goToSpread(BookState.currentSpread - 1);
+    });
+
+    const notesModal = document.getElementById('notes-modal');
+    document.getElementById('btn-notes').addEventListener('click', () => notesModal.classList.remove('hidden'));
+    document.getElementById('btn-close-notes').addEventListener('click', () => notesModal.classList.add('hidden'));
+    notesModal.addEventListener('click', (e) => { if (e.target === notesModal) notesModal.classList.add('hidden'); });
+  </script>
+</body>
+</html>
